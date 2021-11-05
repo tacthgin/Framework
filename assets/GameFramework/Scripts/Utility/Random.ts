@@ -17,7 +17,7 @@ export class Random {
      * 获取随机数
      * @returns
      */
-    private static getRandom() {
+    static getRandom() {
         this.seed = (this.seed * 9301 + 49297) % 233280;
         return this.seed / 233280;
     }
@@ -71,7 +71,7 @@ export class Random {
      * @param array 任意数组
      * @returns
      */
-    static randomArray<T>(array: T[]): T {
+    static randomArray<T>(array: T[]): T | null {
         if (!array || array.length == 0) {
             return null;
         }
