@@ -8,7 +8,7 @@ export class DateUtility {
      * @param format 时间格式
      * @returns
      */
-    static format(timestamp: number, format: string): string {
+    format(timestamp: number, format: string): string {
         let date = new Date(timestamp);
         let dateFormat = {
             "M+": date.getMonth() + 1,
@@ -36,7 +36,7 @@ export class DateUtility {
      * @param format 时间格式
      * @returns
      */
-    static formatInterval(interval: number, format: string): string {
+    formatInterval(interval: number, format: string): string {
         let dateFormat = {
             "h+": Math.floor(interval / 3600),
             "m+": Math.floor((interval % 3600) / 60),
@@ -48,6 +48,7 @@ export class DateUtility {
                 format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateFormat[k] : `00${dateFormat[k]}`.substring(dateFormat[k].toString().length));
             }
         }
+
         return format;
     }
 }
