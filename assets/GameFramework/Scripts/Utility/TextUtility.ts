@@ -29,6 +29,7 @@ export class TextUtility {
      * 格式化数字，宽度2为05、22，宽度3为005，021，100，默认宽度2
      * @param num 数字
      * @param width 宽度
+     * @returns
      */
     formatNumberWidth(num: number, width: number = 2): string {
         let zeroArray = new Array(width).fill(0);
@@ -40,7 +41,7 @@ export class TextUtility {
      * 格式化数字，加上单位
      * @param num 数字
      * @param precision 小数点后保留几位
-     * @returns
+     * @returns 格式化后的“数字+单位”
      */
     formatNumberUnit(num: number, precision: number = 2): string {
         //进制

@@ -1,8 +1,8 @@
-export class CommonUtility {
+export class SystemUtility {
     /**
      * 克隆object
      * @param object
-     * @returns
+     * @returns 克隆过的object
      */
     clone(object: Object | null | undefined): Object | null | undefined {
         if (!object || typeof object != "object") return object;
@@ -27,7 +27,9 @@ export class CommonUtility {
         if (object instanceof Object) {
             let copy: any = {};
             for (let attr in object) {
-                if (object.hasOwnProperty(attr)) copy[attr] = this.clone((object as any)[attr]);
+                if (object.hasOwnProperty(attr)) {
+                    copy[attr] = this.clone((object as any)[attr]);
+                }
             }
             return copy;
         }

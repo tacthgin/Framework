@@ -7,5 +7,6 @@ export class Test extends Component {
     start() {
         console.log(Utility.Random.randomInt(1, 3));
         console.log(Utility.Date.format(Date.now(), "h:m:s"));
+        // throw new Error("haha is test");
     }
 }

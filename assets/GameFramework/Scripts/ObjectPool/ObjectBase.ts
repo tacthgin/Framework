@@ -1,1 +1,3 @@
-export class ObjectBase {}
+export class ObjectBase {
+    
+}
