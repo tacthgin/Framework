@@ -32,5 +32,7 @@ export class Test extends Component {
 
         let collection = new ReferenceCollection(HelloWorldClass);
         collection.acquire(B);
+
+        let aa: { [key: { new (): any }]: number } | null = null;
     }
 }
