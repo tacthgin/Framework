@@ -10,7 +10,7 @@ export class DateUtility {
      */
     format(timestamp: number, format: string): string {
         let date = new Date(timestamp);
-        let dateFormat = {
+        let dateFormat: { [key: string]: number } = {
             "M+": date.getMonth() + 1,
             "d+": date.getDate(),
             "h+": date.getHours(),
@@ -24,7 +24,8 @@ export class DateUtility {
         }
         for (let k in dateFormat) {
             if (new RegExp(`(${k})`).test(format)) {
-                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateFormat[k] : `00${dateFormat[k]}`.substring(dateFormat[k].toString().length));
+                let dateStr = dateFormat[k].toString();
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateStr : `00${dateStr}`.substring(dateStr.length));
             }
         }
         return format;
@@ -37,7 +38,7 @@ export class DateUtility {
      * @returns
      */
     formatInterval(interval: number, format: string): string {
-        let dateFormat = {
+        let dateFormat: { [key: string]: number } = {
             "h+": Math.floor(interval / 3600),
             "m+": Math.floor((interval % 3600) / 60),
             "s+": interval % 60,
@@ -45,7 +46,8 @@ export class DateUtility {
 
         for (let k in dateFormat) {
             if (new RegExp(`(${k})`).test(format)) {
-                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateFormat[k] : `00${dateFormat[k]}`.substring(dateFormat[k].toString().length));
+                let dateStr = dateFormat[k].toString();
+                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? dateStr : `00${dateStr}`.substring(dateStr.length));
             }
         }
 

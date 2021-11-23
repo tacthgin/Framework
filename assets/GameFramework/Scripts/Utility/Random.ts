@@ -91,7 +91,7 @@ export class Random {
             return array;
         }
 
-        let indexes = {};
+        let indexes: { [key: string]: number } = {};
         let randomIndexs = [];
 
         //交换尾部，随机头部部分
@@ -103,11 +103,12 @@ export class Random {
             indexes[index] = indexes[length - 1] || length - 1;
         }
 
+        let result: T[] = [];
         for (let i = 0; i < randomIndexs.length; i++) {
-            randomIndexs[i] = array[randomIndexs[i]];
+            result[i] = array[randomIndexs[i]];
         }
 
-        return randomIndexs;
+        return result;
     }
 
     /**
