@@ -16,20 +16,11 @@ class HelloWorldClass implements IRerference {
     clear(): void {}
 }
 
-interface A<T extends HelloWorldClass> {}
+interface A {}
 
-class C implements A<HelloWorldClass> {}
+class C<T> {}
 
 @ccclass("Test")
 export class Test extends Component {
-    start() {
-        let b = ReferencePool.acquire(B);
-        console.info(ReferencePool.getAllReferencePoolInfos());
-        ReferencePool.release(b);
-        console.info(ReferencePool.getAllReferencePoolInfos());
-        ReferencePool.add(B, 3);
-        console.info(ReferencePool.getAllReferencePoolInfos());
-        ReferencePool.remove(B, 3);
-        console.info(ReferencePool.getAllReferencePoolInfos());
-    }
+    start() {}
 }

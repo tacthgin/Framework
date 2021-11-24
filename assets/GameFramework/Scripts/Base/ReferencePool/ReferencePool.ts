@@ -12,11 +12,10 @@ export class ReferencePool {
 
     static getAllReferencePoolInfos(): ReferencePoolInfo[] {
         let referencePoolInfos: ReferencePoolInfo[] = [];
-        for (let keyValue of this.s_referenceCollections) {
-            let refererenceCollection = keyValue[1];
+        this.s_referenceCollections.forEach((refererenceCollection: ReferenceCollection, referenceType: ReferenceType) => {
             referencePoolInfos.push(
                 new ReferencePoolInfo(
-                    keyValue[0],
+                    referenceType,
                     refererenceCollection.addReferenceCount,
                     refererenceCollection.removeReferenceCount,
                     refererenceCollection.acquireReferenceCount,
@@ -24,7 +23,8 @@ export class ReferencePool {
                     refererenceCollection.releaseRerferenceCount
                 )
             );
-        }
+        });
+
         return referencePoolInfos;
     }
 
