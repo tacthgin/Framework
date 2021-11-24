@@ -1,9 +1,10 @@
 import { GameFrameworkError } from "../GameFrameworkError";
 import { IRerference } from "./IRerference";
+import { ReferenceType } from "./ReferenceType";
 
 export class ReferenceCollection {
     private _references: IRerference[] = [];
-    private _referenceType: { new (): any } = null!;
+    private _referenceType: ReferenceType = null!;
     private _enableStrictCheck: boolean = false;
     private _addReferenceCount: number = 0;
     private _removeReferenceCount: number = 0;
@@ -11,8 +12,12 @@ export class ReferenceCollection {
     private _usingRerferenceCount: number = 0;
     private _releaseRerferenceCount: number = 0;
 
-    constructor(referenceType: { new (): any }) {
+    constructor(referenceType: ReferenceType) {
         this._referenceType = referenceType;
+    }
+
+    get referenceType(): ReferenceType {
+        return this._referenceType;
     }
 
     get unusedReferenceCount(): number {
@@ -39,8 +44,8 @@ export class ReferenceCollection {
         return this._releaseRerferenceCount;
     }
 
-    acquire<T extends IRerference>(type: { new (): T }): T {
-        if (type != this._referenceType) {
+    acquire<T extends IRerference>(referenceType: { new (): T }): T {
+        if (referenceType != this._referenceType) {
             throw new GameFrameworkError("类型不合法");
         }
         ++this._acquireReferenceCount;
@@ -49,7 +54,7 @@ export class ReferenceCollection {
             return this._references.pop() as T;
         }
         ++this._addReferenceCount;
-        return new type();
+        return new referenceType();
     }
 
     release(reference: IRerference): void {
@@ -58,7 +63,7 @@ export class ReferenceCollection {
             throw new GameFrameworkError("引用已经被释放");
         }
         this._references.push(reference);
-        --this._releaseRerferenceCount;
+        ++this._releaseRerferenceCount;
         --this._usingRerferenceCount;
     }
 

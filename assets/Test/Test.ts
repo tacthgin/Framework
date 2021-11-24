@@ -3,17 +3,18 @@ import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFramewor
 import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
 import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
 import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool/ReferenceCollection";
+import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { Utility } from "../GameFramework/Scripts/Utility/Utility";
 const { ccclass, property } = _decorator;
 
 class B implements IRerference {
     constructor() {}
-    clear(): void {
-        throw new Error("Method not implemented.");
-    }
+    clear(): void {}
 }
 
-class HelloWorldClass {}
+class HelloWorldClass implements IRerference {
+    clear(): void {}
+}
 
 interface A<T extends HelloWorldClass> {}
 
@@ -22,17 +23,13 @@ class C implements A<HelloWorldClass> {}
 @ccclass("Test")
 export class Test extends Component {
     start() {
-        console.log(Utility.Random.randomInt(1, 3));
-        console.log(Utility.Date.format(Date.now(), "h:m:s"));
-
-        let a = {
-            [HelloWorldClass.name]: 123,
-        };
-        console.log(typeof B, new B());
-
-        let collection = new ReferenceCollection(HelloWorldClass);
-        collection.acquire(B);
-
-        let aa: { [key: { new (): any }]: number } | null = null;
+        let b = ReferencePool.acquire(B);
+        console.info(ReferencePool.getAllReferencePoolInfos());
+        ReferencePool.release(b);
+        console.info(ReferencePool.getAllReferencePoolInfos());
+        ReferencePool.add(B, 3);
+        console.info(ReferencePool.getAllReferencePoolInfos());
+        ReferencePool.remove(B, 3);
+        console.info(ReferencePool.getAllReferencePoolInfos());
     }
 }
