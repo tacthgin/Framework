@@ -22,5 +22,8 @@ class C<T> {}
 
 @ccclass("Test")
 export class Test extends Component {
-    start() {}
+    start() {
+        let b: B = new B();
+        console.log(b.constructor.name);
+    }
 }

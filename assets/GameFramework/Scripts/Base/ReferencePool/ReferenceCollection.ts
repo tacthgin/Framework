@@ -4,7 +4,7 @@ import { ReferenceType } from "./ReferenceType";
 
 export class ReferenceCollection {
     private _references: IRerference[] = [];
-    private _referenceType: ReferenceType = null!;
+    private _referenceType: ReferenceType<IRerference> = null!;
     private _enableStrictCheck: boolean = false;
     private _addReferenceCount: number = 0;
     private _removeReferenceCount: number = 0;
@@ -12,11 +12,11 @@ export class ReferenceCollection {
     private _usingRerferenceCount: number = 0;
     private _releaseRerferenceCount: number = 0;
 
-    constructor(referenceType: ReferenceType) {
+    constructor(referenceType: ReferenceType<IRerference>) {
         this._referenceType = referenceType;
     }
 
-    get referenceType(): ReferenceType {
+    get referenceType(): ReferenceType<IRerference> {
         return this._referenceType;
     }
 
@@ -44,9 +44,9 @@ export class ReferenceCollection {
         return this._releaseRerferenceCount;
     }
 
-    acquire<T extends IRerference>(referenceType: { new (): T }): T {
+    acquire<T extends IRerference>(referenceType: ReferenceType<T>): T {
         if (referenceType != this._referenceType) {
-            throw new GameFrameworkError("类型不合法");
+            throw new GameFrameworkError("reference type is invalid");
         }
         ++this._acquireReferenceCount;
         ++this._usingRerferenceCount;
@@ -60,7 +60,7 @@ export class ReferenceCollection {
     release(reference: IRerference): void {
         reference.clear();
         if (this._enableStrictCheck && this._references.indexOf(reference) != -1) {
-            throw new GameFrameworkError("引用已经被释放");
+            throw new GameFrameworkError("reference is released");
         }
         this._references.push(reference);
         ++this._releaseRerferenceCount;
