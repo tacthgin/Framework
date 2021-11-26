@@ -11,8 +11,16 @@ export class Object<T extends ObjectBase> implements IRerference {
         return this._object!.name;
     }
 
+    set locked(value: boolean) {
+        this._object!.locked = value;
+    }
+
     get locked(): boolean {
         return this._object!.locked;
+    }
+
+    set priority(value: number) {
+        this._object!.priority = value;
     }
 
     get priority(): number {

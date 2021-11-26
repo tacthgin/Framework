@@ -1,3 +1,4 @@
+import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { Object } from "./Object";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectPoolBase } from "./ObjectPoolBase";
@@ -35,7 +36,16 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
      * 设置对象池容量
      */
     set capacity(value: number) {
+        if (value < 0) {
+            throw new GameFrameworkError("capacity is invalid");
+        }
+
+        if (this._capacity == value) {
+            return;
+        }
+
         this._capacity = value;
+        this.release();
     }
 
     get autoReleaseInterval(): number {
@@ -46,11 +56,58 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         this._autoReleaseInterval = value;
     }
 
+    set expireTime(value: number) {
+        if (value < 0) {
+            throw new GameFrameworkError("expireTime is invalid");
+        }
+
+        if (this._expireTime == value) {
+            return;
+        }
+
+        this._expireTime = value;
+        this.release();
+    }
+
+    get expireTime(): number {
+        return this._expireTime;
+    }
+
+    set priority(value: number) {
+        this._priority = value;
+    }
+
+    get priority(): number {
+        return this._priority;
+    }
+
+    setPriority(obj: object, priority: number): void {
+        let internalObject = this.getObject(obj);
+        if (internalObject) {
+            internalObject.priority = priority;
+        } else {
+            throw new GameFrameworkError(`could not find object in object pool`);
+        }
+    }
+
+    setLocked(obj: object, locked: boolean): void {
+        let internalObject = this.getObject(obj);
+        if (internalObject) {
+            internalObject.locked = locked;
+        } else {
+            throw new GameFrameworkError(`could not find object in object pool`);
+        }
+    }
+
     /**
      * 是否可以获取对象
      */
     canSpawn(): boolean {
         return false;
+    }
+
+    register(obj: T, spawned: boolean): void {
+        throw new Error("Method not implemented.");
     }
 
     /**
@@ -70,4 +127,27 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
      * 释放对象池中的可释放对象。
      */
     release(): void {}
+
+    releaseAllUnused(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    update(elapseSeconds: number): void {
+        this._autoReleaseTime += elapseSeconds;
+        if (this._autoReleaseInterval >= this._autoReleaseInterval) {
+            this.release();
+        }
+    }
+
+    shutDown(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    private getObject(target: object): Object<T> | null {
+        if (!target) {
+            throw new GameFrameworkError("target is null");
+        }
+
+        return this._objectMap.get(target) || null;
+    }
 }
