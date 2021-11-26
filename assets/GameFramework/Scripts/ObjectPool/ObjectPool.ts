@@ -1,4 +1,6 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
+import { GameFrameworkMap } from "../Base/GameFrameworkMap";
+import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { Object } from "./Object";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectPoolBase } from "./ObjectPoolBase";
@@ -7,12 +9,25 @@ import { ObjectPoolBase } from "./ObjectPoolBase";
  * 对象池
  */
 export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
-    private _objectMap = new Map<object, Object<T>>();
+    private _objects: GameFrameworkMap<string, Object<T>> = null!;
+    private _objectMap: Map<object, Object<T>> = null!;
     private _capacity: number = 0;
     private _autoReleaseInterval: number = 0;
     private _expireTime: number = 0;
     private _priority: number = 0;
     private _autoReleaseTime: number = 0;
+
+    constructor(name: string, allowMultiSpawn: boolean, autoReleaseInterval: number, capacity: number, expireTime: number, priority: number) {
+        super();
+        this._objects = new GameFrameworkMap<string, Object<T>>();
+        this._objectMap = new Map<object, Object<T>>();
+        this._name = name;
+        this._allowMultiSpawn = allowMultiSpawn;
+        this._autoReleaseInterval = autoReleaseInterval;
+        this._capacity = capacity;
+        this._expireTime = expireTime;
+        this._priority = priority;
+    }
 
     get name(): string {
         return this._name;
@@ -22,7 +37,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
      * 当前对象池元素数量
      */
     get count(): number {
-        return 0;
+        return this._objectMap.size;
     }
 
     /**
@@ -81,8 +96,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         return this._priority;
     }
 
-    setPriority(obj: object, priority: number): void {
-        let internalObject = this.getObject(obj);
+    setPriority(targetOrObject: object | T, priority: number): void {
+        let internalObject = this.getObject(targetOrObject);
         if (internalObject) {
             internalObject.priority = priority;
         } else {
@@ -90,8 +105,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         }
     }
 
-    setLocked(obj: object, locked: boolean): void {
-        let internalObject = this.getObject(obj);
+    setLocked(targetOrObject: object | T, locked: boolean): void {
+        let internalObject = this.getObject(targetOrObject);
         if (internalObject) {
             internalObject.locked = locked;
         } else {
@@ -99,21 +114,48 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         }
     }
 
+    register(obj: T, spawned: boolean): void {
+        if (!obj) {
+            throw new GameFrameworkError("object is null");
+        }
+
+        let internalObject = Object.create(obj, spawned);
+        this._objectMap.set(obj.target, internalObject);
+        this._objects.set(obj.name, internalObject);
+
+        if (this.count > this.capacity) {
+            this.release();
+        }
+    }
+
     /**
      * 是否可以获取对象
      */
-    canSpawn(): boolean {
-        return false;
-    }
-
-    register(obj: T, spawned: boolean): void {
-        throw new Error("Method not implemented.");
+    canSpawn(name: string = ""): boolean {
+        if (name == null) {
+            throw new GameFrameworkError("name is invalid");
+        }
+        let objectArray = this._objects.get(name);
+        return objectArray ? objectArray.length > 0 : false;
     }
 
     /**
      * 获取对象
      */
-    spawn(): T {
+    spawn(name: string = ""): T | null {
+        if (name == null) {
+            throw new GameFrameworkError("name is invalid");
+        }
+
+        let objectArray = this._objects.get(name);
+        if (objectArray) {
+            for (let i = 0; i < objectArray.length; ++i) {
+                if (this._allowMultiSpawn || !objectArray[i].isInUse) {
+                    return objectArray[i].spawn();
+                }
+            }
+        }
+
         return null;
     }
 
@@ -121,7 +163,36 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
      * 回收对象
      * @param obj
      */
-    upspawn(obj: T): void {}
+    upspawn(obj: T): void {
+        let internalObject = this.getObject(obj);
+        if (internalObject) {
+            internalObject.unspawn();
+            if (this.count > this.capacity && internalObject.spawnCount <= 0) {
+                this.release();
+            }
+        } else {
+            throw new GameFrameworkError("could not find object in object pool");
+        }
+    }
+
+    releaseObject(objectOrTarget: object | T): boolean {
+        let internalObject = this.getObject(objectOrTarget);
+        if (!internalObject) {
+            return false;
+        }
+
+        if (internalObject.isInUse || internalObject.locked || !internalObject.customCanReleaseFlag) {
+            return false;
+        }
+
+        this._objects.delete(internalObject.name, internalObject);
+        this._objectMap.delete(internalObject.peek().target);
+
+        internalObject.release(false);
+        ReferencePool.release(internalObject);
+
+        return true;
+    }
 
     /**
      * 释放对象池中的可释放对象。
@@ -143,9 +214,16 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         throw new Error("Method not implemented.");
     }
 
-    private getObject(target: object): Object<T> | null {
-        if (!target) {
-            throw new GameFrameworkError("target is null");
+    private getObject(targetOrObject: object | T): Object<T> | null {
+        if (!targetOrObject) {
+            throw new GameFrameworkError("target or object is null");
+        }
+
+        let target: object | null = null;
+        if (targetOrObject instanceof ObjectBase) {
+            target = targetOrObject.target;
+        } else {
+            target = targetOrObject;
         }
 
         return this._objectMap.get(target) || null;

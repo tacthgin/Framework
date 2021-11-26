@@ -4,7 +4,8 @@ import { ObjectBase } from "./ObjectBase";
  * 对象池基类
  */
 export abstract class ObjectPoolBase<T extends ObjectBase> {
-    readonly _name: string = "";
+    protected _name: string = "";
+    protected _allowMultiSpawn: boolean = false;
     /**
      * 对象池名字
      */
@@ -58,12 +59,12 @@ export abstract class ObjectPoolBase<T extends ObjectBase> {
     /**
      *  设置对象池中对象优先级
      */
-    abstract setPriority(obj: object, priority: number): void;
+    abstract setPriority(targetOrObject: object | T, priority: number): void;
 
     /**
      *  锁定对象池中对象
      */
-    abstract setLocked(obj: object, locked: boolean): void;
+    abstract setLocked(targetOrObject: object | T, locked: boolean): void;
 
     /**
      * 创建对象
@@ -80,13 +81,18 @@ export abstract class ObjectPoolBase<T extends ObjectBase> {
     /**
      * 获取对象
      */
-    abstract spawn(name: string): T;
+    abstract spawn(name: string): T | null;
 
     /**
      * 回收对象
      * @param obj
      */
     abstract upspawn(obj: T): void;
+
+    /**
+     * 释放对象。
+     */
+    abstract releaseObject(objectOrTarget: T | object): boolean;
 
     /**
      * 释放对象池中的可释放对象。

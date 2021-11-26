@@ -7,14 +7,14 @@ export abstract class ObjectBase implements IRerference {
     private _locked: boolean = false;
     private _priority: number = 0;
     private _lastUseTime: number = 0;
-    private _customCanReleaseFlag: boolean = false;
+    private _customCanReleaseFlag: boolean = true;
 
     get name(): string {
         return this._name;
     }
 
-    get target(): object | null {
-        return this._target;
+    get target(): object {
+        return this._target!;
     }
 
     set locked(value: boolean) {
