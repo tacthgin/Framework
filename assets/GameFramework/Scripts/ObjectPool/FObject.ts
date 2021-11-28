@@ -3,7 +3,7 @@ import { IRerference } from "../Base/ReferencePool/IRerference";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { ObjectBase } from "./ObjectBase";
 
-export class Object<T extends ObjectBase> implements IRerference {
+export class FObject<T extends ObjectBase> implements IRerference {
     private _object: T | null = null;
     private _spawnCount: number = 0;
 
@@ -43,12 +43,12 @@ export class Object<T extends ObjectBase> implements IRerference {
         return this._spawnCount;
     }
 
-    static create<T extends ObjectBase>(obj: T, spawned: boolean): Object<T> {
+    static create<T extends ObjectBase>(obj: T, spawned: boolean): FObject<T> {
         if (!obj) {
             throw new GameFrameworkError("object is invalid");
         }
 
-        let internalObject: Object<T> = ReferencePool.acquire(Object);
+        let internalObject: FObject<T> = ReferencePool.acquire(FObject);
         internalObject._object = obj;
         internalObject._spawnCount = spawned ? 1 : 0;
         if (spawned) {

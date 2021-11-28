@@ -1,7 +1,7 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkMap } from "../Base/GameFrameworkMap";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
-import { Object } from "./Object";
+import { FObject } from "./FObject";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectPoolBase } from "./ObjectPoolBase";
 
@@ -9,8 +9,8 @@ import { ObjectPoolBase } from "./ObjectPoolBase";
  * 对象池
  */
 export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
-    private _objects: GameFrameworkMap<string, Object<T>> = null!;
-    private _objectMap: Map<object, Object<T>> = null!;
+    private _objects: GameFrameworkMap<string, FObject<T>> = null!;
+    private _objectMap: Map<object, FObject<T>> = null!;
     private _capacity: number = 0;
     private _autoReleaseInterval: number = 0;
     private _expireTime: number = 0;
@@ -19,8 +19,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
 
     constructor(name: string, allowMultiSpawn: boolean, autoReleaseInterval: number, capacity: number, expireTime: number, priority: number) {
         super();
-        this._objects = new GameFrameworkMap<string, Object<T>>();
-        this._objectMap = new Map<object, Object<T>>();
+        this._objects = new GameFrameworkMap<string, FObject<T>>();
+        this._objectMap = new Map<object, FObject<T>>();
         this._name = name;
         this._allowMultiSpawn = allowMultiSpawn;
         this._autoReleaseInterval = autoReleaseInterval;
@@ -119,7 +119,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
             throw new GameFrameworkError("object is null");
         }
 
-        let internalObject = Object.create(obj, spawned);
+        let internalObject = FObject.create(obj, spawned);
         this._objectMap.set(obj.target, internalObject);
         this._objects.set(obj.name, internalObject);
 
@@ -214,7 +214,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         throw new Error("Method not implemented.");
     }
 
-    private getObject(targetOrObject: object | T): Object<T> | null {
+    private getObject(targetOrObject: object | T): FObject<T> | null {
         if (!targetOrObject) {
             throw new GameFrameworkError("target or object is null");
         }

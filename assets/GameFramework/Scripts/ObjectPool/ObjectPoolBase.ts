@@ -104,6 +104,10 @@ export abstract class ObjectPoolBase<T extends ObjectBase> {
      */
     abstract releaseAllUnused(): void;
 
+    /**
+     * 更新对象池
+     * @param elapseSeconds 逻辑流逝时间
+     */
     abstract update(elapseSeconds: number): void;
 
     /**
