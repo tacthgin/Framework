@@ -1,10 +1,10 @@
 import { GameFrameworkError } from "../GameFrameworkError";
 import { IRerference } from "./IRerference";
-import { ReferenceType } from "./ReferenceType";
+import { ReferenceConstructor } from "./ReferenceConstructor";
 
 export class ReferenceCollection {
     private _references: IRerference[] = [];
-    private _referenceType: ReferenceType<IRerference> = null!;
+    private _referenceConstructor: ReferenceConstructor<IRerference> = null!;
     private _enableStrictCheck: boolean = false;
     private _addReferenceCount: number = 0;
     private _removeReferenceCount: number = 0;
@@ -12,12 +12,12 @@ export class ReferenceCollection {
     private _usingRerferenceCount: number = 0;
     private _releaseRerferenceCount: number = 0;
 
-    constructor(referenceType: ReferenceType<IRerference>) {
-        this._referenceType = referenceType;
+    constructor(referenceConstructor: ReferenceConstructor<IRerference>) {
+        this._referenceConstructor = referenceConstructor;
     }
 
-    get referenceType(): ReferenceType<IRerference> {
-        return this._referenceType;
+    get referenceConstructor(): ReferenceConstructor<IRerference> {
+        return this._referenceConstructor;
     }
 
     get unusedReferenceCount(): number {
@@ -44,8 +44,8 @@ export class ReferenceCollection {
         return this._releaseRerferenceCount;
     }
 
-    acquire<T extends IRerference>(referenceType: ReferenceType<T>): T {
-        if (referenceType != this._referenceType) {
+    acquire<T extends IRerference>(referenceConstructor: ReferenceConstructor<T>): T {
+        if (referenceConstructor != this._referenceConstructor) {
             throw new GameFrameworkError("reference type is invalid");
         }
         ++this._acquireReferenceCount;
@@ -54,7 +54,7 @@ export class ReferenceCollection {
             return this._references.pop() as T;
         }
         ++this._addReferenceCount;
-        return new referenceType();
+        return new referenceConstructor();
     }
 
     release(reference: IRerference): void {
@@ -70,7 +70,7 @@ export class ReferenceCollection {
     add(count: number): void {
         this._addReferenceCount += count;
         while (count-- > 0) {
-            this._references.push(new this._referenceType());
+            this._references.push(new this._referenceConstructor());
         }
     }
 

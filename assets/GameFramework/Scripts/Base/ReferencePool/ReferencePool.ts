@@ -1,10 +1,10 @@
 import { IRerference } from "./IRerference";
 import { ReferenceCollection } from "./ReferenceCollection";
+import { ReferenceConstructor } from "./ReferenceConstructor";
 import { ReferencePoolInfo } from "./ReferencePoolInfo";
-import { ReferenceType } from "./ReferenceType";
 
 export class ReferencePool {
-    private static s_referenceCollections = new Map<ReferenceType<IRerference>, ReferenceCollection>();
+    private static s_referenceCollections = new Map<ReferenceConstructor<IRerference>, ReferenceCollection>();
 
     static get count() {
         return this.s_referenceCollections.size;
@@ -12,10 +12,10 @@ export class ReferencePool {
 
     static getAllReferencePoolInfos(): ReferencePoolInfo[] {
         let referencePoolInfos: ReferencePoolInfo[] = [];
-        this.s_referenceCollections.forEach((refererenceCollection: ReferenceCollection, referenceType: ReferenceType<IRerference>) => {
+        this.s_referenceCollections.forEach((refererenceCollection: ReferenceCollection, referenceConstructor: ReferenceConstructor<IRerference>) => {
             referencePoolInfos.push(
                 new ReferencePoolInfo(
-                    referenceType,
+                    referenceConstructor,
                     refererenceCollection.addReferenceCount,
                     refererenceCollection.removeReferenceCount,
                     refererenceCollection.acquireReferenceCount,
@@ -28,28 +28,28 @@ export class ReferencePool {
         return referencePoolInfos;
     }
 
-    static acquire<T extends IRerference>(referenceType: ReferenceType<T>): T {
-        let referenceCollection = this.getReferenceCollection(referenceType);
-        return referenceCollection.acquire(referenceType);
+    static acquire<T extends IRerference>(referenceConstructor: ReferenceConstructor<T>): T {
+        let referenceCollection = this.getReferenceCollection(referenceConstructor);
+        return referenceCollection.acquire(referenceConstructor);
     }
 
     static release(reference: IRerference): void {
-        this.getReferenceCollection(reference.constructor as ReferenceType<IRerference>).release(reference);
+        this.getReferenceCollection(reference.constructor as ReferenceConstructor<IRerference>).release(reference);
     }
 
-    static add(referenceType: ReferenceType<IRerference>, count: number): void {
-        this.getReferenceCollection(referenceType).add(count);
+    static add(referenceConstructor: ReferenceConstructor<IRerference>, count: number): void {
+        this.getReferenceCollection(referenceConstructor).add(count);
     }
 
-    static remove(referenceType: ReferenceType<IRerference>, count: number): void {
-        this.getReferenceCollection(referenceType).remove(count);
+    static remove(referenceConstructor: ReferenceConstructor<IRerference>, count: number): void {
+        this.getReferenceCollection(referenceConstructor).remove(count);
     }
 
-    private static getReferenceCollection(referenceType: ReferenceType<IRerference>): ReferenceCollection {
-        let referenceCollection: ReferenceCollection | undefined = this.s_referenceCollections.get(referenceType);
+    private static getReferenceCollection(referenceConstructor: ReferenceConstructor<IRerference>): ReferenceCollection {
+        let referenceCollection: ReferenceCollection | undefined = this.s_referenceCollections.get(referenceConstructor);
         if (!referenceCollection) {
-            referenceCollection = new ReferenceCollection(referenceType);
-            this.s_referenceCollections.set(referenceType, referenceCollection);
+            referenceCollection = new ReferenceCollection(referenceConstructor);
+            this.s_referenceCollections.set(referenceConstructor, referenceCollection);
         }
         return referenceCollection;
     }

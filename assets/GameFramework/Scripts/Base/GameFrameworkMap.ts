@@ -78,5 +78,7 @@ export class GameFrameworkMap<K, V> {
         return this._map.entries();
     }
 
-    [Symbol.toStringTag]: string = `[object GameFrameworkMap]`;
+    get [Symbol.toStringTag](): string {
+        return "GameFrameworkMap";
+    }
 }

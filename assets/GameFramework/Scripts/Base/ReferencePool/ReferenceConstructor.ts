@@ -1,5 +1,5 @@
 import { IRerference } from "./IRerference";
 
-export interface ReferenceType<T extends IRerference> {
+export interface ReferenceConstructor<T extends IRerference> {
     new (): T;
 }

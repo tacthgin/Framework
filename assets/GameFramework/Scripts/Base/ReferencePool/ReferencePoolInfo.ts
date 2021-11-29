@@ -1,8 +1,8 @@
 import { IRerference } from "./IRerference";
-import { ReferenceType } from "./ReferenceType";
+import { ReferenceConstructor } from "./ReferenceConstructor";
 
 export class ReferencePoolInfo {
-    private _referenceType: ReferenceType<IRerference> = null!;
+    private _referenceConstructor: ReferenceConstructor<IRerference> = null!;
     private _addReferenceCount: number = 0;
     private _removeReferenceCount: number = 0;
     private _acquireReferenceCount: number = 0;
@@ -10,14 +10,14 @@ export class ReferencePoolInfo {
     private _releaseRerferenceCount: number = 0;
 
     constructor(
-        referenceType: ReferenceType<IRerference>,
+        referenceConstructor: ReferenceConstructor<IRerference>,
         addReferenceCount: number,
         removeReferenceCount: number,
         acquireReferenceCount: number,
         usingRerferenceCount: number,
         releaseRerferenceCount: number
     ) {
-        this._referenceType = referenceType;
+        this._referenceConstructor = referenceConstructor;
         this._addReferenceCount = addReferenceCount;
         this._removeReferenceCount = removeReferenceCount;
         this._acquireReferenceCount = acquireReferenceCount;
@@ -25,8 +25,8 @@ export class ReferencePoolInfo {
         this._releaseRerferenceCount = releaseRerferenceCount;
     }
 
-    get referenceType(): ReferenceType<IRerference> {
-        return this._referenceType;
+    get referenceConstructor(): ReferenceConstructor<IRerference> {
+        return this._referenceConstructor;
     }
 
     get addReferenceCount(): number {

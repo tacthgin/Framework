@@ -1,4 +1,5 @@
 import { ObjectBase } from "./ObjectBase";
+import { ObjectInfo } from "./ObjectInfo";
 
 /**
  * 对象池基类
@@ -103,6 +104,11 @@ export abstract class ObjectPoolBase<T extends ObjectBase> {
      * 释放对象池中的所有未使用的对象
      */
     abstract releaseAllUnused(): void;
+
+    /**
+     * 获取对象池中所有对象信息
+     */
+    abstract GetAllObjectInfos(): ObjectInfo[];
 
     /**
      * 更新对象池
