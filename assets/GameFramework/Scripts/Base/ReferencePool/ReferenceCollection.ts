@@ -3,7 +3,7 @@ import { IRerference } from "./IRerference";
 import { ReferenceConstructor } from "./ReferenceConstructor";
 
 export class ReferenceCollection {
-    private _references: IRerference[] = [];
+    private readonly _references: Array<IRerference> = null!;
     private _referenceConstructor: ReferenceConstructor<IRerference> = null!;
     private _enableStrictCheck: boolean = false;
     private _addReferenceCount: number = 0;
@@ -14,6 +14,7 @@ export class ReferenceCollection {
 
     constructor(referenceConstructor: ReferenceConstructor<IRerference>) {
         this._referenceConstructor = referenceConstructor;
+        this._references = new Array<IRerference>();
     }
 
     get referenceConstructor(): ReferenceConstructor<IRerference> {

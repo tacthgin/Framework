@@ -4,7 +4,7 @@ import { ReferenceConstructor } from "./ReferenceConstructor";
 import { ReferencePoolInfo } from "./ReferencePoolInfo";
 
 export class ReferencePool {
-    private static s_referenceCollections = new Map<ReferenceConstructor<IRerference>, ReferenceCollection>();
+    private static readonly s_referenceCollections = new Map<ReferenceConstructor<IRerference>, ReferenceCollection>();
 
     static get count() {
         return this.s_referenceCollections.size;

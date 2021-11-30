@@ -11,13 +11,10 @@ import { ReleaseObjectFilterCallback } from "./ReleaseObjectFilterCallback";
  * 对象池
  */
 export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
-    GetAllObjectInfos(): ObjectInfo[] {
-        throw new Error("Method not implemented.");
-    }
-    private _objects: GameFrameworkMap<string, FObject<T>> = null!;
-    private _objectMap: Map<object, FObject<T>> = null!;
-    private _cachedCanReleaseObjects: Array<T> = null!;
-    private _cachedNeedReleaseObjects: Array<T> = null!;
+    private readonly _objects: GameFrameworkMap<string, FObject<T>> = null!;
+    private readonly _objectMap: Map<object, FObject<T>> = null!;
+    private readonly _cachedCanReleaseObjects: Array<T> = null!;
+    private readonly _cachedNeedReleaseObjects: Array<T> = null!;
     private _capacity: number = 0;
     private _autoReleaseInterval: number = 0;
     private _expireTime: number = 0;
@@ -242,6 +239,18 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         });
     }
 
+    GetAllObjectInfos(): ObjectInfo[] {
+        let results: ObjectInfo[] = [];
+        this._objects.forEach((internalObjects: FObject<T>[]) => {
+            internalObjects.forEach((internalObject: FObject<T>) => {
+                results.push(
+                    new ObjectInfo(internalObject.name, internalObject.locked, internalObject.customCanReleaseFlag, internalObject.priority, internalObject.lastUseTime, internalObject.spawnCount)
+                );
+            });
+        });
+        return results;
+    }
+
     update(elapseSeconds: number): void {
         this._autoReleaseTime += elapseSeconds;
         if (this._autoReleaseInterval >= this._autoReleaseInterval) {
@@ -250,7 +259,14 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
     }
 
     shutDown(): void {
-        throw new Error("Method not implemented.");
+        this._objectMap.forEach((internalObject: FObject<T>) => {
+            internalObject.release(true);
+            ReferencePool.release(internalObject);
+        });
+        this._objectMap.clear();
+        this._objects.clear();
+        this._cachedCanReleaseObjects.length = 0;
+        this._cachedNeedReleaseObjects.length = 0;
     }
 
     private getObject(targetOrObject: object | T): FObject<T> | null {
