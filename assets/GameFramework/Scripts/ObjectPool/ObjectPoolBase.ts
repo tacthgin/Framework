@@ -77,12 +77,12 @@ export abstract class ObjectPoolBase<T extends ObjectBase> {
     /**
      * 是否可以获取对象
      */
-    abstract canSpawn(name: string): boolean;
+    abstract canSpawn(name?: string): boolean;
 
     /**
      * 获取对象
      */
-    abstract spawn(name: string): T | null;
+    abstract spawn(name?: string): T | null;
 
     /**
      * 回收对象

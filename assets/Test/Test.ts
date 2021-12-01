@@ -33,7 +33,12 @@ export class Test extends Component {
         let manager: IObejctPoolManager = new ObjectPoolManager();
         let objectPool = manager.createSingleSpawnObjectPool(B, "test b", 5, 10);
         for (let i = 0; i < 5; i++) {
-            objectPool.register(new B(), true);
+            let b = new B();
+            b.initialize("", new C());
+            objectPool.register(b, true);
         }
+        let results: any[] = [];
+        manager.getAllObjectPools(true, results);
+        console.log(results, manager.hasObjectPool(B, "test b"));
     }
 }
