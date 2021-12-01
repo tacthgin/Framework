@@ -56,56 +56,81 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return null;
     }
 
-    getAllObjectPools(sort: boolean): ObjectPoolBase<ObjectBase>[] {
-        let results: ObjectPoolBase<ObjectBase>[] = [];
+    getAllObjectPools(sort: boolean, results: ObjectPoolBase<ObjectBase>[]): void {
+        results.length = 0;
+
         this._objectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
             results.push(objectPool);
         });
-        return results;
+
+        if (sort) {
+            results.sort(ObjectPoolManager.ObjectPoolComparer);
+        }
     }
 
     createSingleSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
-        autoReleaseInterval: number,
-        capacity: number,
-        expireTime: number,
-        priority: number
+        autoReleaseInterval: number = this._defaultExpireTime,
+        capacity: number = this._defaultCapacity,
+        expireTime: number = this._defaultExpireTime,
+        priority: number = this._defaultPriority
     ): ObjectPoolBase<T> {
-        throw new Error("Method not implemented.");
+        return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority);
     }
 
     CreateMultiSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
-        autoReleaseInterval: number,
-        capacity: number,
-        expireTime: number,
-        priority: number
+        autoReleaseInterval: number = this._defaultExpireTime,
+        capacity: number = this._defaultCapacity,
+        expireTime: number = this._defaultExpireTime,
+        priority: number = this._defaultPriority
     ): ObjectPoolBase<T> {
-        throw new Error("Method not implemented.");
+        return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority);
     }
 
     destroyObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): boolean {
-        throw new Error("Method not implemented.");
+        if (!constructor) {
+            throw new GameFrameworkError("constructor is invalid");
+        }
+        let constructorNamePair = this.internalGetObjectPoolPair(constructor, name);
+        if (constructorNamePair) {
+            let objectPool = this._objectPools.get(constructorNamePair);
+            objectPool?.shutDown();
+            this._constructorToPairMap.delete(constructor, constructorNamePair);
+            this._objectPools.delete(constructorNamePair);
+            return true;
+        }
+        return false;
     }
 
     release(): void {
-        throw new Error("Method not implemented.");
+        this.getAllObjectPools(true, this._cachedAllObjectPools);
+        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+            objectPool.release();
+        });
     }
 
     releaseAllUnused(): void {
-        throw new Error("Method not implemented.");
+        this.getAllObjectPools(true, this._cachedAllObjectPools);
+        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+            objectPool.releaseAllUnused();
+        });
     }
 
     private internalGetObjectPoolPair<T extends ObjectBase>(constructor: Constructor<T>, name?: string): ConstructorNamePair<ObjectBase> | null {
-        let pairs = this._constructorToPairMap.get(constructor);
-        if (pairs) {
+        if (!constructor) {
+            throw new GameFrameworkError("constructor is invalid");
+        }
+
+        let constructorNamePairs = this._constructorToPairMap.get(constructor);
+        if (constructorNamePairs) {
             name = name || "";
-            let index = pairs.findIndex((pair: ConstructorNamePair<ObjectBase>) => {
+            let index = constructorNamePairs.findIndex((pair: ConstructorNamePair<ObjectBase>) => {
                 return pair.name == name;
             });
-            return index != -1 ? pairs[index] : null;
+            return index != -1 ? constructorNamePairs[index] : null;
         }
         return null;
     }
@@ -114,19 +139,27 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         constructor: Constructor<T>,
         name: string,
         allowMultiSpawn: boolean,
-        autoReleaseInterval: number = this._defaultExpireTime,
-        capacity: number = this._defaultCapacity,
-        expireTime: number = this._defaultExpireTime,
-        priority: number = this._defaultPriority
+        autoReleaseInterval: number,
+        capacity: number,
+        expireTime: number,
+        priority: number
     ): ObjectPoolBase<T> {
+        if (!constructor) {
+            throw new GameFrameworkError("constructor is invalid");
+        }
+
         if (this.hasObjectPool(constructor, name)) {
             throw new GameFrameworkError(`object pool ${name} already exist`);
         }
 
         let objectPool = new ObjectPool<T>(name, allowMultiSpawn, autoReleaseInterval, capacity, expireTime, priority);
-        let pair = new ConstructorNamePair(constructor, name);
-        this._constructorToPairMap.set(constructor, pair);
-        this._objectPools.set(pair, objectPool);
+        let constructorNamePair = new ConstructorNamePair(constructor, name);
+        this._constructorToPairMap.set(constructor, constructorNamePair);
+        this._objectPools.set(constructorNamePair, objectPool);
         return objectPool;
+    }
+
+    private static ObjectPoolComparer(left: ObjectPoolBase<ObjectBase>, right: ObjectPoolBase<ObjectBase>): number {
+        return right.priority - left.priority;
     }
 }

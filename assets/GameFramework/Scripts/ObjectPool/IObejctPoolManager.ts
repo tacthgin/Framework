@@ -10,18 +10,25 @@ export interface IObejctPoolManager {
 
     getObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): ObjectPoolBase<T> | null;
 
-    getAllObjectPools(sort: boolean): ObjectPoolBase<ObjectBase>[];
+    getAllObjectPools(sort: boolean, results: ObjectPoolBase<ObjectBase>[]): void;
 
     createSingleSpawnObjectPool<T extends ObjectBase>(
         constructor: Constructor<T>,
         name: string,
-        autoReleaseInterval: number,
-        capacity: number,
-        expireTime: number,
-        priority: number
+        autoReleaseInterval?: number,
+        capacity?: number,
+        expireTime?: number,
+        priority?: number
     ): ObjectPoolBase<T>;
 
-    CreateMultiSpawnObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name: string, autoReleaseInterval: number, capacity: number, expireTime: number, priority: number): ObjectPoolBase<T>;
+    CreateMultiSpawnObjectPool<T extends ObjectBase>(
+        constructor: Constructor<T>,
+        name: string,
+        autoReleaseInterval?: number,
+        capacity?: number,
+        expireTime?: number,
+        priority?: number
+    ): ObjectPoolBase<T>;
 
     destroyObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): boolean;
 

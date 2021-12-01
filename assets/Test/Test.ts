@@ -6,11 +6,16 @@ import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
 import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
 import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool/ReferenceCollection";
 import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
+import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctPoolManager";
+import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
+import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
 import { Utility } from "../GameFramework/Scripts/Utility/Utility";
 const { ccclass, property } = _decorator;
 
-class B implements IRerference {
-    constructor() {}
+class B extends ObjectBase {
+    constructor() {
+        super();
+    }
     clear(): void {}
 }
 
@@ -25,9 +30,10 @@ class C<T> {}
 @ccclass("Test")
 export class Test extends Component {
     start() {
-        let map: Map<ConstructorNamePair<B>, string> = new Map<ConstructorNamePair<B>, string>();
-        map.set(new ConstructorNamePair(B), "hhaha");
-        console.log(map.has(new ConstructorNamePair(B)));
-        Symbol.toPrimitive
+        let manager: IObejctPoolManager = new ObjectPoolManager();
+        let objectPool = manager.createSingleSpawnObjectPool(B, "test b", 5, 10);
+        for (let i = 0; i < 5; i++) {
+            objectPool.register(new B(), true);
+        }
     }
 }

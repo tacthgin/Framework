@@ -142,9 +142,6 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         }
     }
 
-    /**
-     * 是否可以获取对象
-     */
     canSpawn(name: string = ""): boolean {
         if (name == null) {
             throw new GameFrameworkError("name is invalid");
@@ -153,9 +150,6 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         return objectArray ? objectArray.length > 0 : false;
     }
 
-    /**
-     * 获取对象
-     */
     spawn(name: string = ""): T | null {
         if (name == null) {
             throw new GameFrameworkError("name is invalid");
@@ -173,10 +167,6 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         return null;
     }
 
-    /**
-     * 回收对象
-     * @param obj
-     */
     upspawn(obj: T): void {
         let internalObject = this.getObject(obj);
         if (internalObject) {
@@ -208,9 +198,6 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         return true;
     }
 
-    /**
-     * 释放对象池中的可释放对象。
-     */
     release(releaseCount?: number, releaseObjectFilterCallback?: ReleaseObjectFilterCallback<T>): void {
         releaseCount = releaseCount || this.count - this.capacity;
         if (releaseCount < 0) {
