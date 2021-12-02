@@ -40,5 +40,10 @@ export class Test extends Component {
         let results: any[] = [];
         manager.getAllObjectPools(true, results);
         console.log(results, manager.hasObjectPool(B, "test b"));
+
+        let amap = new Map<number | string, string>();
+        amap.set("1", "2");
+        amap.set(1, "3");
+        console.log(amap);
     }
 }
