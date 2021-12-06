@@ -1,6 +1,7 @@
 import { Component, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
+import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
 import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
 import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
@@ -45,5 +46,25 @@ export class Test extends Component {
         amap.set("1", "2");
         amap.set(1, "3");
         console.log(amap);
+
+        let list = new GameFrameworkLinkedList<number>();
+        list.addLast(3);
+        list.addLast(2);
+        list.addLast(1);
+        list.printList();
+        console.log(list.has(2));
+        list.remove(2);
+        console.log(list.has(2));
+        list.forEach((value: number) => {
+            console.log(value);
+        });
+
+        for (let value of list) {
+            console.log(value);
+        }
+
+        for (let value in list) {
+            console.log(value);
+        }
     }
 }
