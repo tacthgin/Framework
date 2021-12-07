@@ -2,7 +2,7 @@ import { IRerference } from "../ReferencePool/IRerference";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 import { BaseEventArgs } from "./BaseEventArgs";
 
-export class GameEvent<T extends BaseEventArgs> implements IRerference {
+export class Event<T extends BaseEventArgs> implements IRerference {
     private _sender: object | null = null;
     private _eventArgs: T | null = null;
 
@@ -14,8 +14,8 @@ export class GameEvent<T extends BaseEventArgs> implements IRerference {
         return this._eventArgs;
     }
 
-    static create<T extends BaseEventArgs>(sender: object, eventArgs: T): GameEvent<T> {
-        let eventNode: GameEvent<T> = ReferencePool.acquire(GameEvent);
+    static create<T extends BaseEventArgs>(sender: object, eventArgs: T): Event<T> {
+        let eventNode: Event<T> = ReferencePool.acquire(Event);
         eventNode._sender = sender;
         eventNode._eventArgs = eventArgs;
         return eventNode;

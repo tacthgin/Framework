@@ -23,7 +23,7 @@
     "_prefab": null,
     "autoReleaseAssets": false,
     "_globals": {
-      "__id__": 5
+      "__id__": 7
     },
     "_id": "a7025b4e-7bba-49de-9161-171222fa5aba"
   },
@@ -34,14 +34,18 @@
     "_parent": {
       "__id__": 1
     },
-    "_children": [],
+    "_children": [
+      {
+        "__id__": 3
+      }
+    ],
     "_active": true,
     "_components": [
       {
-        "__id__": 3
+        "__id__": 5
       },
       {
-        "__id__": 4
+        "__id__": 6
       }
     ],
     "_prefab": null,
@@ -72,6 +76,60 @@
       "z": 0
     },
     "_id": "c9DMICJLFO5IeO07EPon7U"
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "test2",
+    "_objFlags": 0,
+    "_parent": {
+      "__id__": 2
+    },
+    "_children": [],
+    "_active": true,
+    "_components": [
+      {
+        "__id__": 4
+      }
+    ],
+    "_prefab": null,
+    "_lpos": {
+      "__type__": "cc.Vec3",
+      "x": 4.7617023394976153e-7,
+      "y": -0.07992461996535073,
+      "z": -17.32032397391895
+    },
+    "_lrot": {
+      "__type__": "cc.Quat",
+      "x": 0.2778159369243488,
+      "y": 0.3649716648580256,
+      "z": 0.11507512578569958,
+      "w": 0.8811195752396249
+    },
+    "_lscale": {
+      "__type__": "cc.Vec3",
+      "x": 1.0000000122115493,
+      "y": 1.000000007540065,
+      "z": 1.0000000175431805
+    },
+    "_layer": 1073741824,
+    "_euler": {
+      "__type__": "cc.Vec3",
+      "x": 26.341001856843995,
+      "y": 39.32268842048707,
+      "z": 23.927464362212838
+    },
+    "_id": "c7TwZG4ZRDDKSM+B3N6nEG"
+  },
+  {
+    "__type__": "6289cqfQNlN9rlouNBymL/V",
+    "_name": "",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 3
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "_id": "5aEN5g/LVN86KbIZcMjqbb"
   },
   {
     "__type__": "cc.Camera",
@@ -128,16 +186,16 @@
   {
     "__type__": "cc.SceneGlobals",
     "ambient": {
-      "__id__": 6
-    },
-    "shadows": {
-      "__id__": 7
-    },
-    "_skybox": {
       "__id__": 8
     },
-    "fog": {
+    "shadows": {
       "__id__": 9
+    },
+    "_skybox": {
+      "__id__": 10
+    },
+    "fog": {
+      "__id__": 11
     }
   },
   {

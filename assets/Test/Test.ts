@@ -1,4 +1,4 @@
-import { Component, _decorator } from "cc";
+import { Component, find, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
@@ -12,6 +12,7 @@ import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctP
 import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
 import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
 import { Utility } from "../GameFramework/Scripts/Utility/Utility";
+import { Test2 } from "./Test2";
 const { ccclass, property } = _decorator;
 
 class B extends ObjectBase {
@@ -31,6 +32,7 @@ class C<T> {}
 
 @ccclass("Test")
 export class Test extends Component {
+    private a: number = 1;
     start() {
         let manager: IObejctPoolManager = new ObjectPoolManager();
         let objectPool = manager.createSingleSpawnObjectPool(B, "test b", 5, 10);
@@ -53,6 +55,9 @@ export class Test extends Component {
             key[1].printList();
         }
 
+        find("test2", this.node)?.getComponent(Test2)?.setCallback(this.testa);
+
+        console.log(this.testa, this.testa.bind(this), this.testa == this.testa);
         // let list = new GameFrameworkLinkedList<number>();
         // list.addLast(3);
         // list.addLast(2);
@@ -70,5 +75,10 @@ export class Test extends Component {
         // list.addLast(9);
         // list.addLast(10);
         // list.printList();
+    }
+
+    testa() {
+        ++this.a;
+        console.log("a", this, this.a);
     }
 }
