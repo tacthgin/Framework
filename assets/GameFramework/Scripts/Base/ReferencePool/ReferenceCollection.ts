@@ -4,7 +4,7 @@ import { ReferenceConstructor } from "./ReferenceConstructor";
 
 export class ReferenceCollection {
     private readonly _references: Array<IRerference> = null!;
-    private _referenceConstructor: ReferenceConstructor<IRerference> = null!;
+    private readonly _referenceConstructor: ReferenceConstructor<IRerference> = null!;
     private _enableStrictCheck: boolean = false;
     private _addReferenceCount: number = 0;
     private _removeReferenceCount: number = 0;

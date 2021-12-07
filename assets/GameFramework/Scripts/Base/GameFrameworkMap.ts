@@ -1,8 +1,14 @@
+import { GameFrameworkLinkedList } from "./GameFrameworkLinkedList";
+
 /**
  * 游戏多重元素map
  */
 export class GameFrameworkMap<K, V> {
-    private _map: Map<K, Array<V>> = new Map<K, Array<V>>();
+    private readonly _map: Map<K, GameFrameworkLinkedList<V>> = null!;
+
+    constructor() {
+        this._map = new Map<K, GameFrameworkLinkedList<V>>();
+    }
 
     get size(): number {
         return this._map.size;
@@ -13,56 +19,48 @@ export class GameFrameworkMap<K, V> {
     }
 
     delete(key: K, value?: V): boolean {
-        if (!value) {
-            return this._map.delete(key);
-        } else {
-            let array = this._map.get(key);
-            if (array) {
-                let index = array.indexOf(value);
-                if (index != -1) {
-                    array.splice(index, 1);
-                    return true;
-                }
+        if (value != undefined) {
+            let list = this._map.get(key);
+            if (list) {
+                return list.remove(value);
             }
+        } else {
+            return this._map.delete(key);
         }
         return false;
     }
 
-    forEach(callbackfn: (value: V[], key: K, map: Map<K, V[]>) => void, thisArg?: any): void {
+    forEach(callbackfn: (value: GameFrameworkLinkedList<V>, key: K, map: Map<K, GameFrameworkLinkedList<V>>) => void, thisArg?: any): void {
         this._map.forEach(callbackfn, thisArg);
     }
 
-    get(key: K): V[] | undefined {
+    get(key: K): GameFrameworkLinkedList<V> | undefined {
         return this._map.get(key);
     }
 
     has(key: K, value?: V): boolean {
-        if (!value) {
-            return this._map.has(key);
-        } else {
-            let array = this._map.get(key);
-            if (array) {
-                return array.indexOf(value) != -1;
+        if (value != undefined) {
+            let list = this._map.get(key);
+            if (list) {
+                return list.has(value);
             }
+        } else {
+            return this._map.has(key);
         }
         return false;
     }
 
     set(key: K, value: V): this {
-        let array = this._map.get(key);
-        if (!array) {
-            array = new Array<V>();
-            this._map.set(key, array);
+        let list = this._map.get(key);
+        if (!list) {
+            list = new GameFrameworkLinkedList<V>();
+            this._map.set(key, list);
         }
-
-        if (array.indexOf(value) == -1) {
-            array.push(value);
-        }
-
+        list.addLast(value);
         return this;
     }
 
-    entries(): IterableIterator<[K, V[]]> {
+    entries(): IterableIterator<[K, GameFrameworkLinkedList<V>]> {
         return this._map.entries();
     }
 
@@ -70,11 +68,11 @@ export class GameFrameworkMap<K, V> {
         return this._map.keys();
     }
 
-    values(): IterableIterator<V[]> {
+    values(): IterableIterator<GameFrameworkLinkedList<V>> {
         return this._map.values();
     }
 
-    [Symbol.iterator](): IterableIterator<[K, V[]]> {
+    [Symbol.iterator](): IterableIterator<[K, GameFrameworkLinkedList<V>]> {
         return this._map.entries();
     }
 

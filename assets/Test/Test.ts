@@ -2,6 +2,7 @@ import { Component, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
+import { GameFrameworkMap } from "../GameFramework/Scripts/Base/GameFrameworkMap";
 import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFrameworkLog";
 import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
 import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
@@ -42,27 +43,32 @@ export class Test extends Component {
         manager.getAllObjectPools(true, results);
         console.log(results, manager.hasObjectPool(B, "test b"));
 
-        let amap = new Map<number | string, string>();
+        let amap = new GameFrameworkMap<string, string>();
         amap.set("1", "2");
-        amap.set(1, "3");
+        amap.set("1", "3");
         console.log(amap);
 
-        let list = new GameFrameworkLinkedList<number>();
-        list.addLast(3);
-        list.addLast(2);
-        list.addLast(1);
-        list.printList();
+        for (let key of amap) {
+            console.log(key);
+            console.log(key[1].printList());
+        }
 
-        let node = list.get(2);
-        list.addBefore(node!, 4);
-        list.addAfter(node!, 5);
-        list.printList();
-        list.removeFirst();
-        list.removeFirst();
-        list.addFirst(7);
-        list.removeLast();
-        list.addLast(9);
-        list.addLast(10);
-        list.printList();
+        // let list = new GameFrameworkLinkedList<number>();
+        // list.addLast(3);
+        // list.addLast(2);
+        // list.addLast(1);
+        // list.printList();
+
+        // let node = list.get(2);
+        // list.addBefore(node!, 4);
+        // list.addAfter(node!, 5);
+        // list.printList();
+        // list.removeFirst();
+        // list.removeFirst();
+        // list.addFirst(7);
+        // list.removeLast();
+        // list.addLast(9);
+        // list.addLast(10);
+        // list.printList();
     }
 }

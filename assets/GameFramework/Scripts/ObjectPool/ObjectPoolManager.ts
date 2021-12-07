@@ -127,10 +127,10 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         let constructorNamePairs = this._constructorToPairMap.get(constructor);
         if (constructorNamePairs) {
             name = name || "";
-            let index = constructorNamePairs.findIndex((pair: ConstructorNamePair<ObjectBase>) => {
+            let node = constructorNamePairs.find((pair: ConstructorNamePair<ObjectBase>) => {
                 return pair.name == name;
             });
-            return index != -1 ? constructorNamePairs[index] : null;
+            return node ? node.value : null;
         }
         return null;
     }

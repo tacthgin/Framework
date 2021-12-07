@@ -82,16 +82,17 @@ export class GameFrameworkLinkedList<T> {
      * @returns 链表节点或空
      */
     get(value: T, reverse: boolean = false): LinkedListNode<T> | null {
-        let current = reverse ? this._last : this._first;
-        let next = this.getNextIterator(reverse);
-        while (current) {
-            if (current.value === value) {
-                return current;
-            }
-            current = next(current);
+        let node: LinkedListNode<T> | null = null;
+        if (reverse) {
+            node = this.lastFind((memberValue: T) => {
+                return value === memberValue;
+            });
+        } else {
+            node = this.find((memberValue: T) => {
+                return value === memberValue;
+            });
         }
-
-        return null;
+        return node;
     }
 
     /**
@@ -101,6 +102,42 @@ export class GameFrameworkLinkedList<T> {
      */
     has(value: T): boolean {
         return this.get(value) != null;
+    }
+
+    /**
+     * 查找符合比较函数的节点
+     * @param compareToFn 比较函数
+     * @param thisArg 函数this指针
+     * @returns 链表节点
+     */
+    find(compareToFn: (value: T) => boolean, thisArg?: any): LinkedListNode<T> | null {
+        let current = this._first;
+        while (current) {
+            if (compareToFn.call(thisArg, current.value!)) {
+                return current;
+            }
+            current = current.next;
+        }
+
+        return null;
+    }
+
+    /**
+     * 从尾部查找符合比较函数的节点
+     * @param compareToFn 比较函数
+     * @param thisArg 函数this指针
+     * @returns 链表节点
+     */
+    lastFind(compareToFn: (value: T) => boolean, thisArg?: any): LinkedListNode<T> | null {
+        let current = this._last;
+        while (current) {
+            if (compareToFn.call(thisArg, current.value!)) {
+                return current;
+            }
+            current = current.previous;
+        }
+
+        return null;
     }
 
     /**
@@ -302,16 +339,6 @@ export class GameFrameworkLinkedList<T> {
     private addToEmpty(value: T): void {
         let newNode = this.acquireNode(value);
         this._last = this._first = newNode;
-    }
-
-    private getNextIterator(reverse: boolean) {
-        return reverse
-            ? (currentNode: LinkedListNode<T>) => {
-                  return currentNode.previous;
-              }
-            : (currentNode: LinkedListNode<T>) => {
-                  return currentNode.next;
-              };
     }
 
     printList() {
