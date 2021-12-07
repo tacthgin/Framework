@@ -1,5 +1,8 @@
 import { GameFrameworkError } from "./GameFrameworkError";
 
+/**
+ * 双链表节点
+ */
 export class LinkedListNode<T> {
     private _next: LinkedListNode<T> | null = null;
     private _previous: LinkedListNode<T> | null = null;
@@ -32,6 +35,12 @@ export class LinkedListNode<T> {
     get value(): T | null {
         return this._value;
     }
+
+    clear() {
+        this._value = null;
+        this._previous = null;
+        this._next = null;
+    }
 }
 
 /** 双链表 */
@@ -45,45 +54,59 @@ export class GameFrameworkLinkedList<T> {
         this._cacheNodes = new Array<LinkedListNode<T>>();
     }
 
+    /**
+     * 链表容量大小
+     */
     get size(): number {
         return this._size;
     }
 
+    /**
+     * 头节点
+     */
     get first(): LinkedListNode<T> | null {
         return this._first;
     }
 
+    /**
+     * 尾节点
+     */
     get last(): LinkedListNode<T> | null {
         return this._last;
     }
 
-    get(value: T): LinkedListNode<T> | null {
-        let current = this._first;
+    /**
+     * 根据指定的值查找第一个符合的链表节点
+     * @param value 指定的值
+     * @param reverse 反向查找
+     * @returns 链表节点或空
+     */
+    get(value: T, reverse: boolean = false): LinkedListNode<T> | null {
+        let current = reverse ? this._last : this._first;
+        let next = this.getNextIterator(reverse);
         while (current) {
-            if (current.value == value) {
+            if (current.value === value) {
                 return current;
             }
-            current = current.next;
+            current = next(current);
         }
 
         return null;
     }
 
-    lastGet(value: T): LinkedListNode<T> | null {
-        let current = this._last;
-        while (current) {
-            if (current.value == value) {
-                return current;
-            }
-            current = current.previous;
-        }
-        return null;
-    }
-
+    /**
+     * 链表中存在该指定的值值相等的节点
+     * @param value 指定的值
+     * @returns
+     */
     has(value: T): boolean {
         return this.get(value) != null;
     }
 
+    /**
+     * 链表头部添加新节点
+     * @param value 指定的值
+     */
     addFirst(value: T): void {
         if (this.size == 0) {
             this.addToEmpty(value);
@@ -92,6 +115,10 @@ export class GameFrameworkLinkedList<T> {
         }
     }
 
+    /**
+     * 链表尾部添加新节点
+     * @param value 指定的值
+     */
     addLast(value: T): void {
         if (this.size == 0) {
             this.addToEmpty(value);
@@ -100,6 +127,11 @@ export class GameFrameworkLinkedList<T> {
         }
     }
 
+    /**
+     * 在链表节点前添加一个新节点
+     * @param node 链表节点
+     * @param value 指定的值
+     */
     addBefore(node: LinkedListNode<T>, value: T): void {
         if (!node) {
             throw new GameFrameworkError("node is invalid");
@@ -107,12 +139,20 @@ export class GameFrameworkLinkedList<T> {
         let newNode = this.acquireNode(value);
         newNode.next = node;
         newNode.previous = node.previous;
+        if (newNode.previous) {
+            newNode.previous.next = newNode;
+        }
         node.previous = newNode;
         if (this._first == node) {
             this._first = newNode;
         }
     }
 
+    /**
+     * 在链表节点后添加一个新节点
+     * @param node 链表节点
+     * @param value 指定的值
+     */
     addAfter(node: LinkedListNode<T>, value: T): void {
         if (!node) {
             throw new GameFrameworkError("node is invalid");
@@ -120,26 +160,50 @@ export class GameFrameworkLinkedList<T> {
         let newNode = this.acquireNode(value);
         newNode.previous = node;
         newNode.next = node.next;
+        if (newNode.next) {
+            newNode.next.previous = newNode;
+        }
         node.next = newNode;
         if (node == this._last) {
             this._last = newNode;
         }
     }
 
-    remove(node: LinkedListNode<T> | T): void {
-        if (!node) {
-            throw new GameFrameworkError("node is invalid");
+    /**
+     * 从链表中移除节点，或者移除与指定值相等的第一个节点
+     * @param nodeOrValue 链表节点或者需要移除的值
+     * @param reverse 反向查找与指定值相等的节点
+     * @returns
+     */
+    remove(nodeOrValue: LinkedListNode<T> | T, reverse: boolean = false): boolean {
+        if (!nodeOrValue) {
+            throw new GameFrameworkError("node or value is invalid");
         }
-        this.internalRemoveNode(node, false);
+
+        let node: LinkedListNode<T> | null = nodeOrValue instanceof LinkedListNode ? nodeOrValue : this.get(nodeOrValue, reverse);
+        if (node) {
+            if (node.previous) {
+                node.previous.next = node.next;
+                if (node == this._last) {
+                    this._last = node.previous;
+                }
+            }
+
+            if (node.next) {
+                node.next.previous = node.previous;
+                if (node == this._first) {
+                    this._first = node.next;
+                }
+            }
+            this.releaseNode(node);
+            return true;
+        }
+        return false;
     }
 
-    lastRemove(node: LinkedListNode<T> | T): void {
-        if (!node) {
-            throw new GameFrameworkError("node is invalid");
-        }
-        this.internalRemoveNode(node, true);
-    }
-
+    /**
+     * 移除头部节点
+     */
     removeFirst(): void {
         if (!this.first) {
             throw new GameFrameworkError("first is invalid");
@@ -147,13 +211,42 @@ export class GameFrameworkLinkedList<T> {
         this.remove(this.first);
     }
 
+    /**
+     * 移除尾部节点
+     */
     removeLast(): void {
         if (!this.last) {
             throw new GameFrameworkError("last is invalid");
         }
-        this.remove(this.last);
+        this.remove(this.last, true);
     }
 
+    /**
+     * 清除链表
+     */
+    clear() {
+        let current = this._first;
+        let next: LinkedListNode<T> | null = null;
+        while (current) {
+            next = current.next;
+            this.releaseNode(current);
+            current = next;
+        }
+        this._first = this._last = null;
+    }
+
+    /**
+     * 清除所有缓存的节点
+     */
+    clearCacheNodes() {
+        this._cacheNodes.length = 0;
+    }
+
+    /**
+     * 头节点遍历到尾节点
+     * @param callbackfn 遍历回调函数
+     * @param thisArg 函数this指针
+     */
     forEach(callbackfn: (value: T, index: number, linkedList: GameFrameworkLinkedList<T>) => void, thisArg?: any): void {
         let current = this._first;
         let listIndex = 0;
@@ -183,6 +276,9 @@ export class GameFrameworkLinkedList<T> {
     }
 
     private acquireNode(value: T): LinkedListNode<T> {
+        if (!value) {
+            throw new GameFrameworkError("value is invalid");
+        }
         ++this._size;
         if (this._cacheNodes.length > 0) {
             let node = this._cacheNodes.pop();
@@ -195,7 +291,11 @@ export class GameFrameworkLinkedList<T> {
     }
 
     private releaseNode(node: LinkedListNode<T>): void {
-        node.value = null;
+        if (!node) {
+            throw new GameFrameworkError("node is invalid");
+        }
+        node.clear();
+        --this._size;
         this._cacheNodes.push(node);
     }
 
@@ -204,42 +304,22 @@ export class GameFrameworkLinkedList<T> {
         this._last = this._first = newNode;
     }
 
-    private internalRemoveNode(nodeOrValue: LinkedListNode<T> | T, reverse: boolean) {
-        let current = reverse ? this._last : this._first;
-        let next = reverse
+    private getNextIterator(reverse: boolean) {
+        return reverse
             ? (currentNode: LinkedListNode<T>) => {
                   return currentNode.previous;
               }
             : (currentNode: LinkedListNode<T>) => {
                   return currentNode.next;
               };
-
-        while (current) {
-            if (GameFrameworkLinkedList.compareTo(current, nodeOrValue)) {
-                if (current.previous) {
-                    current.previous.next = current.next;
-                }
-
-                if (current.next) {
-                    current.next.previous = current.previous;
-                }
-                --this._size;
-                this.releaseNode(current);
-                break;
-            }
-            current = next(current);
-        }
-    }
-
-    private static compareTo<T>(left: LinkedListNode<T>, right: LinkedListNode<T> | T) {
-        return right instanceof LinkedListNode ? left == right : left.value == right;
     }
 
     printList() {
         let current = this._first;
         while (current) {
-            console.log(current.value);
+            console.log(current.value, "front:", current.previous && current.previous.value, "back:", current.next && current.next.value);
             current = current.next;
         }
+        console.log("****************************");
     }
 }

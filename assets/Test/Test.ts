@@ -52,19 +52,17 @@ export class Test extends Component {
         list.addLast(2);
         list.addLast(1);
         list.printList();
-        console.log(list.has(2));
-        list.remove(2);
-        console.log(list.has(2));
-        list.forEach((value: number) => {
-            console.log(value);
-        });
 
-        for (let value of list) {
-            console.log(value);
-        }
-
-        for (let value in list) {
-            console.log(value);
-        }
+        let node = list.get(2);
+        list.addBefore(node!, 4);
+        list.addAfter(node!, 5);
+        list.printList();
+        list.removeFirst();
+        list.removeFirst();
+        list.addFirst(7);
+        list.removeLast();
+        list.addLast(9);
+        list.addLast(10);
+        list.printList();
     }
 }
