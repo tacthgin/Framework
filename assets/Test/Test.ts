@@ -50,7 +50,7 @@ export class Test extends Component {
 
         for (let key of amap) {
             console.log(key);
-            console.log(key[1].printList());
+            key[1].printList();
         }
 
         // let list = new GameFrameworkLinkedList<number>();

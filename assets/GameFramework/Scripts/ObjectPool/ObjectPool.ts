@@ -1,4 +1,5 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
+import { GameFrameworkLinkedList } from "../Base/GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../Base/GameFrameworkMap";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { FObject } from "./FObject";
@@ -146,8 +147,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
         if (name == null) {
             throw new GameFrameworkError("name is invalid");
         }
-        let objectArray = this._objects.get(name);
-        return objectArray ? objectArray.length > 0 : false;
+        let objectList = this._objects.get(name);
+        return objectList ? objectList.size > 0 : false;
     }
 
     spawn(name: string = ""): T | null {
@@ -155,11 +156,11 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
             throw new GameFrameworkError("name is invalid");
         }
 
-        let objectArray = this._objects.get(name);
-        if (objectArray) {
-            for (let i = 0; i < objectArray.length; ++i) {
-                if (this._allowMultiSpawn || !objectArray[i].isInUse) {
-                    return objectArray[i].spawn();
+        let objectList = this._objects.get(name);
+        if (objectList) {
+            for (let internalObject of objectList) {
+                if (this._allowMultiSpawn || !internalObject.isInUse) {
+                    return internalObject.spawn();
                 }
             }
         }
@@ -228,7 +229,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
 
     GetAllObjectInfos(): ObjectInfo[] {
         let results: ObjectInfo[] = [];
-        this._objects.forEach((internalObjects: FObject<T>[]) => {
+        this._objects.forEach((internalObjects: GameFrameworkLinkedList<FObject<T>>) => {
             internalObjects.forEach((internalObject: FObject<T>) => {
                 results.push(
                     new ObjectInfo(internalObject.name, internalObject.locked, internalObject.customCanReleaseFlag, internalObject.priority, internalObject.lastUseTime, internalObject.spawnCount)
