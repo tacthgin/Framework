@@ -18,11 +18,11 @@ export class GameFrameworkEntry {
         };
     }
 
-    static getModule<T>(): GameFrameworkModule | null {
+    static getModule<T>(): T | null {
         for (let listNode of this.s_gameFrameworkModules) {
             let interfaceFlag = this.s_gameFrameworkModulesConstrustor.get(listNode.value!.constructor as Constructor);
             if (interfaceFlag && this.isInterface<T>(listNode.value!, interfaceFlag)) {
-                return listNode.value!;
+                return listNode.value! as T;
             }
         }
         return null;
