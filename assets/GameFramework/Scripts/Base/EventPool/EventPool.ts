@@ -99,7 +99,7 @@ export class EventPool<T extends BaseEventArgs> {
     }
 
     private handleEvent(sender: object, e: T): void {
-        let eventHandleTargetList = this._eventHandles.get(e.Id);
+        let eventHandleTargetList = this._eventHandles.get(e.id);
         if (eventHandleTargetList) {
             eventHandleTargetList.forEach((eventHandleTarget: EventHandleTarget<T>) => {
                 if (eventHandleTarget.target) {
@@ -109,7 +109,7 @@ export class EventPool<T extends BaseEventArgs> {
                 }
             });
         } else {
-            throw new GameFrameworkError(`event id:${e.Id} has not event handle`);
+            throw new GameFrameworkError(`event id:${e.id} has not event handle`);
         }
 
         ReferencePool.release(e);
