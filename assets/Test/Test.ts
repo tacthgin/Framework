@@ -8,6 +8,8 @@ import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
 import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
 import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool/ReferenceCollection";
 import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
+import { EventManager } from "../GameFramework/Scripts/Event/EventManager";
+import { IEventManager } from "../GameFramework/Scripts/Event/IEventManager";
 import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctPoolManager";
 import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
 import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
@@ -45,8 +47,8 @@ export class Test extends Component {
         manager.getAllObjectPools(true, results);
         console.log(results, manager.hasObjectPool(B, "test b"));
 
-        let amap = new GameFrameworkMap<string, string>();
-        amap.set("1", "2");
+        let amap = new GameFrameworkMap<IEventManager, string>();
+        amap.set(new EventManager(), "2");
         amap.set("1", "3");
         console.log(amap);
 

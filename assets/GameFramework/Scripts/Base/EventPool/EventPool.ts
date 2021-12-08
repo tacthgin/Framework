@@ -29,6 +29,10 @@ export class EventPool<T extends BaseEventArgs> {
         this._events.length = 0;
     }
 
+    clear() {
+        this._events.length = 0;
+    }
+
     subscribe(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
         if (!eventHandle) {
             throw new GameFrameworkError("eventHandle is invalid");

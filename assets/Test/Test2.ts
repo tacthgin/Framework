@@ -5,6 +5,10 @@ const { ccclass, property } = _decorator;
 export class Test2 extends Component {
     private callback: Function | null = null;
 
+    onLoad() {
+        
+    }
+
     setCallback(callback: Function, thisArg?: any) {
         this.callback = callback;
 
