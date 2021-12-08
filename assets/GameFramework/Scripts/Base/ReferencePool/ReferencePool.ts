@@ -45,6 +45,17 @@ export class ReferencePool {
         this.getReferenceCollection(referenceConstructor).remove(count);
     }
 
+    static removeAll(referenceConstructor: ReferenceConstructor<IRerference>) {
+        this.getReferenceCollection(referenceConstructor).removeAll();
+    }
+
+    static clearAll() {
+        this.s_referenceCollections.forEach((refererenceCollection: ReferenceCollection) => {
+            refererenceCollection.removeAll();
+        });
+        this.s_referenceCollections.clear();
+    }
+
     private static getReferenceCollection(referenceConstructor: ReferenceConstructor<IRerference>): ReferenceCollection {
         let referenceCollection: ReferenceCollection | undefined = this.s_referenceCollections.get(referenceConstructor);
         if (!referenceCollection) {
