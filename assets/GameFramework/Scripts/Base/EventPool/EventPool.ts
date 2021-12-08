@@ -16,6 +16,19 @@ export class EventPool<T extends BaseEventArgs> {
         this._events = new Array<Event<T>>();
     }
 
+    update(elapseSeconds: number): void {
+        if (this._events.length > 0) {
+            let event: Event<T> = this._events.pop()!;
+            this.handleEvent(event.sender!, event.eventArgs!);
+        }
+    }
+
+    shutDown() {
+        this._eventHandles.clear();
+        this._targetHandles.clear();
+        this._events.length = 0;
+    }
+
     subscribe(id: number, eventHandle: EventHandle<T>, thisArg?: any): void {
         if (!eventHandle) {
             throw new GameFrameworkError("eventHandle is invalid");
@@ -31,23 +44,23 @@ export class EventPool<T extends BaseEventArgs> {
         if (!eventHandle) {
             throw new GameFrameworkError("eventHandle is invalid");
         }
-        let list = this._eventHandles.get(id);
-        if (list) {
-            let node = list.find((eventTargetHandle: EventHandleTarget<T>) => {
+        let eventHandleTargetList = this._eventHandles.get(id);
+        if (eventHandleTargetList) {
+            let node = eventHandleTargetList.find((eventTargetHandle: EventHandleTarget<T>) => {
                 return eventTargetHandle.handle == eventHandle && eventTargetHandle.target == thisArg;
             });
             if (node) {
-                list.remove(node);
+                eventHandleTargetList.remove(node);
                 this._targetHandles.delete(node.value!.target!, node.value!);
                 this.releaseEventHandleTarget(node.value!);
             }
         }
     }
 
-    unsubscribeTarget(target: object) {
-        let list = this._targetHandles.get(target);
-        if (list) {
-            list.forEach((eventHandleTarget: EventHandleTarget<T>) => {
+    unsubscribeTarget(target: object): void {
+        let eventHandleTargetList = this._targetHandles.get(target);
+        if (eventHandleTargetList) {
+            eventHandleTargetList.forEach((eventHandleTarget: EventHandleTarget<T>) => {
                 this._eventHandles.delete(eventHandleTarget.id!, eventHandleTarget);
                 this.releaseEventHandleTarget(eventHandleTarget);
             });
@@ -60,9 +73,9 @@ export class EventPool<T extends BaseEventArgs> {
             throw new GameFrameworkError("eventHandle is invalid");
         }
 
-        let list = this._eventHandles.get(id);
-        if (list) {
-            let node = list.find((eventTargetHandle: EventHandleTarget<T>) => {
+        let eventHandleTargetList = this._eventHandles.get(id);
+        if (eventHandleTargetList) {
+            let node = eventHandleTargetList.find((eventTargetHandle: EventHandleTarget<T>) => {
                 return eventTargetHandle.handle == eventHandle && eventTargetHandle.target == thisArg;
             });
             return node != null;
@@ -70,9 +83,39 @@ export class EventPool<T extends BaseEventArgs> {
         return false;
     }
 
-    fire(sender: object, e: T) {}
+    fire(sender: object, e: T): void {
+        if (!e) {
+            throw new GameFrameworkError("event is invalid");
+        }
+        let event = Event.create(sender, e);
+        this._events.splice(0, 0, event);
+    }
 
-    private releaseEventHandleTarget(eventHandleTarget: EventHandleTarget<T>) {
+    fireNow(sender: object, e: T): void {
+        if (!e) {
+            throw new GameFrameworkError("event is invalid");
+        }
+        this.handleEvent(sender, e);
+    }
+
+    private handleEvent(sender: object, e: T): void {
+        let eventHandleTargetList = this._eventHandles.get(e.Id);
+        if (eventHandleTargetList) {
+            eventHandleTargetList.forEach((eventHandleTarget: EventHandleTarget<T>) => {
+                if (eventHandleTarget.target) {
+                    eventHandleTarget.handle?.call(eventHandleTarget.target, sender, e);
+                } else {
+                    eventHandleTarget.handle!(sender, e);
+                }
+            });
+        } else {
+            throw new GameFrameworkError(`event id:${e.Id} has not event handle`);
+        }
+
+        ReferencePool.release(e);
+    }
+
+    private releaseEventHandleTarget(eventHandleTarget: EventHandleTarget<T>): void {
         ReferencePool.release(eventHandleTarget);
     }
 }
