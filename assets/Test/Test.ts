@@ -1,6 +1,7 @@
 import { Component, find, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
+import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
 import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../GameFramework/Scripts/Base/GameFrameworkMap";
 import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFrameworkLog";
@@ -36,6 +37,9 @@ class C<T> {}
 export class Test extends Component {
     private a: number = 1;
     start() {
+        console.log("clear" in new B());
+        GameFrameworkEntry.createModules();
+        console.log(GameFrameworkEntry.getModule<IObejctPoolManager>());
         let manager: IObejctPoolManager = new ObjectPoolManager();
         let objectPool = manager.createSingleSpawnObjectPool(B, "test b", 5, 10);
         for (let i = 0; i < 5; i++) {
@@ -49,7 +53,7 @@ export class Test extends Component {
 
         let amap = new GameFrameworkMap<IEventManager, string>();
         amap.set(new EventManager(), "2");
-        amap.set("1", "3");
+        console.log(EventManager, new EventManager() instanceof EventManager);
         console.log(amap);
 
         for (let key of amap) {
@@ -77,10 +81,17 @@ export class Test extends Component {
         // list.addLast(9);
         // list.addLast(10);
         // list.printList();
+        console.log(this.isString(1));
     }
+
+    testb(object: any) {}
 
     testa() {
         ++this.a;
         console.log("a", this, this.a);
+    }
+
+    isString(test: any): test is A {
+        return typeof test === "string";
     }
 }
