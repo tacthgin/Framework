@@ -9,11 +9,8 @@ import { ObjectBase } from "./ObjectBase";
 import { ObjectPool } from "./ObjectPool";
 import { ObjectPoolBase } from "./ObjectPoolBase";
 
-@GameFrameworkEntry.registerModule("MODULE_OBJECT_POOL_MANAGER")
+@GameFrameworkEntry.registerModule("ObjectPoolManager")
 export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoolManager {
-    /** 对象池管理标识符 */
-    readonly MODULE_OBJECT_POOL_MANAGER: string = "MODULE_OBJECT_POOL_MANAGER";
-
     private readonly _defaultCapacity: number = Number.MAX_SAFE_INTEGER;
     private readonly _defaultExpireTime: number = Number.MAX_VALUE;
     private readonly _defaultPriority: number = 0;

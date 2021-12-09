@@ -37,51 +37,11 @@ class C<T> {}
 export class Test extends Component {
     private a: number = 1;
     start() {
-        console.log("clear" in new B());
-        GameFrameworkEntry.createModules();
-        console.log(GameFrameworkEntry.getModule<IObejctPoolManager>());
-        let manager: IObejctPoolManager = new ObjectPoolManager();
-        let objectPool = manager.createSingleSpawnObjectPool(B, "test b", 5, 10);
-        for (let i = 0; i < 5; i++) {
-            let b = new B();
-            b.initialize("", new C());
-            objectPool.register(b, true);
-        }
-        let results: any[] = [];
-        manager.getAllObjectPools(true, results);
-        console.log(results, manager.hasObjectPool(B, "test b"));
+        GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
+    }
 
-        let amap = new GameFrameworkMap<IEventManager, string>();
-        amap.set(new EventManager(), "2");
-        console.log(EventManager, new EventManager() instanceof EventManager);
-        console.log(amap);
-
-        for (let key of amap) {
-            console.log(key);
-            key[1].printList();
-        }
-
-        find("test2", this.node)?.getComponent(Test2)?.setCallback(this.testa.bind(this));
-
-        console.log(this.testa, this.testa.bind(this), this.testa == this.testa);
-        // let list = new GameFrameworkLinkedList<number>();
-        // list.addLast(3);
-        // list.addLast(2);
-        // list.addLast(1);
-        // list.printList();
-
-        // let node = list.get(2);
-        // list.addBefore(node!, 4);
-        // list.addAfter(node!, 5);
-        // list.printList();
-        // list.removeFirst();
-        // list.removeFirst();
-        // list.addFirst(7);
-        // list.removeLast();
-        // list.addLast(9);
-        // list.addLast(10);
-        // list.printList();
-        console.log(this.isString(1));
+    onCallback(sender: object, e: any) {
+        console.log("receive sender", sender, e);
     }
 
     testb(object: any) {}

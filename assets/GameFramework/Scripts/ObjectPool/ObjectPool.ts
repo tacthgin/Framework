@@ -1,5 +1,5 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
-import { GameFrameworkLinkedList } from "../Base/GameFrameworkLinkedList";
+import { GameFrameworkLinkedList, LinkedListNode } from "../Base/GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../Base/GameFrameworkMap";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { FObject } from "./FObject";
@@ -158,9 +158,9 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
 
         let objectList = this._objects.get(name);
         if (objectList) {
-            for (let internalObject of objectList) {
-                if (this._allowMultiSpawn || !internalObject.isInUse) {
-                    return internalObject.spawn();
+            for (let node of objectList) {
+                if (this._allowMultiSpawn || !node.value.isInUse) {
+                    return node.value.spawn();
                 }
             }
         }
@@ -230,7 +230,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
     GetAllObjectInfos(): ObjectInfo[] {
         let results: ObjectInfo[] = [];
         this._objects.forEach((internalObjects: GameFrameworkLinkedList<FObject<T>>) => {
-            internalObjects.forEach((internalObject: FObject<T>) => {
+            internalObjects.forEach((node: LinkedListNode<FObject<T>>) => {
+                let internalObject = node.value;
                 results.push(
                     new ObjectInfo(internalObject.name, internalObject.locked, internalObject.customCanReleaseFlag, internalObject.priority, internalObject.lastUseTime, internalObject.spawnCount)
                 );

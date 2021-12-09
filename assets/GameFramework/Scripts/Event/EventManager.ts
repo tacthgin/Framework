@@ -1,9 +1,11 @@
 import { EventHandle } from "../Base/EventPool/EventHandle";
 import { EventPool } from "../Base/EventPool/EventPool";
+import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameEventArgs } from "./GameEventArgs";
 import { IEventManager } from "./IEventManager";
 
+@GameFrameworkEntry.registerModule("EventManager")
 export class EventManager extends GameFrameworkModule implements IEventManager {
     private _eventPool: EventPool<GameEventArgs> = null!;
 
@@ -45,6 +47,6 @@ export class EventManager extends GameFrameworkModule implements IEventManager {
     }
 
     fireNow(sender: object, e: GameEventArgs): void {
-        this._eventPool.fire(sender, e);
+        this._eventPool.fireNow(sender, e);
     }
 }

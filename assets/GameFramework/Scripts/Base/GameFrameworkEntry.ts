@@ -1,38 +1,33 @@
 import { Constructor } from "./DataStruct/Constructor";
+import { GameFrameworkError } from "./GameFrameworkError";
 import { GameFrameworkLinkedList, LinkedListNode } from "./GameFrameworkLinkedList";
 import { GameFrameworkModule } from "./GameFrameworkModule";
 
 export class GameFrameworkEntry {
     private static s_gameFrameworkModules: GameFrameworkLinkedList<GameFrameworkModule> = new GameFrameworkLinkedList<GameFrameworkModule>();
-    private static s_gameFrameworkModulesConstrustor: Map<Constructor, string> = new Map<Constructor, string>();
+    private static s_gameFrameworkModulesConstrustor: Map<string, Constructor> = new Map<string, Constructor>();
+    private static s_cachedGameFrameworkModule: Map<string, GameFrameworkModule> = new Map<string, GameFrameworkModule>();
 
-    static createModules(): void {
-        this.s_gameFrameworkModulesConstrustor.forEach((flag: string, constructor: Constructor) => {
-            this.createModule(constructor);
-        });
-    }
-
-    static registerModule(interfaceFlag: string): (target: Constructor) => void {
+    static registerModule(className: string): (target: Constructor) => void {
         return (target: Constructor) => {
-            this.s_gameFrameworkModulesConstrustor.set(target, interfaceFlag);
+            this.s_gameFrameworkModulesConstrustor.set(className, target);
         };
     }
 
-    static getModule<T>(): T | null {
-        for (let listNode of this.s_gameFrameworkModules) {
-            let interfaceFlag = this.s_gameFrameworkModulesConstrustor.get(listNode.value.constructor as Constructor);
-            if (interfaceFlag && this.isInterface<T>(listNode.value, interfaceFlag)) {
-                return listNode.value as T;
+    static getModule<T>(className: string): T {
+        let module = this.s_cachedGameFrameworkModule.get(className);
+        if (!module) {
+            let moduleConstructor = this.s_gameFrameworkModulesConstrustor.get(className);
+            if (!moduleConstructor) {
+                throw new GameFrameworkError(`${className} can't find module`);
             }
+            module = this.createModule(moduleConstructor);
+            this.s_cachedGameFrameworkModule.set(className, module);
         }
-        return null;
+        return module as unknown as T;
     }
 
-    private static isInterface<T>(obj: any, interfaceFlag: string): obj is T {
-        return interfaceFlag in obj;
-    }
-
-    private static createModule(constructor: Constructor): void {
+    private static createModule(constructor: Constructor): GameFrameworkModule {
         let module: GameFrameworkModule = new constructor() as GameFrameworkModule;
         let node: LinkedListNode<GameFrameworkModule> | null = null;
         if (this.s_gameFrameworkModules.size > 0) {
@@ -48,5 +43,7 @@ export class GameFrameworkEntry {
         } else {
             this.s_gameFrameworkModules.addLast(module);
         }
+
+        return module;
     }
 }

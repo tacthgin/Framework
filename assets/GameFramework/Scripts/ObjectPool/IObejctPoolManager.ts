@@ -3,7 +3,6 @@ import { ObjectBase } from "./ObjectBase";
 import { ObjectPoolBase } from "./ObjectPoolBase";
 
 export interface IObejctPoolManager {
-    readonly MODULE_OBJECT_POOL_MANAGER: string;
     readonly priority: number;
     readonly count: number;
 

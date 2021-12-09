@@ -21,6 +21,7 @@ export class EventPool<T extends BaseEventArgs> {
         if (this._events.length > 0) {
             let event: Event<T> = this._events.pop()!;
             this.handleEvent(event.sender, event.eventArgs);
+            ReferencePool.release(event);
         }
     }
 
@@ -52,7 +53,7 @@ export class EventPool<T extends BaseEventArgs> {
         let eventHandleTargetList = this._eventHandles.get(id);
         if (eventHandleTargetList) {
             let node = eventHandleTargetList.find((eventTargetHandle: EventHandleTarget<T>) => {
-                return eventTargetHandle.handle == eventHandle && eventTargetHandle.target == thisArg;
+                return eventTargetHandle.handle === eventHandle && eventTargetHandle.target === thisArg;
             });
             if (node) {
                 eventHandleTargetList.remove(node);
