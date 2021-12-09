@@ -16,4 +16,6 @@ export class Utility {
     static readonly Math: MathUtility = new MathUtility();
     /** 文本工具类 */
     static readonly Text: TextUtility = new TextUtility();
+    /** Json工具类 */
+    static readonly Json: TextUtility = new TextUtility();
 }
