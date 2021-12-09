@@ -8,16 +8,16 @@ export class EventHandleTarget<T> implements IRerference {
     private _target: object | null = null;
     private _handle: EventHandle<T> | null = null;
 
-    get id(): number | null {
-        return this._id;
+    get id(): number {
+        return this._id!;
     }
 
-    get target(): object | null {
-        return this._target;
+    get target(): object {
+        return this._target!;
     }
 
-    get handle(): EventHandle<T> | null {
-        return this._handle;
+    get handle(): EventHandle<T> {
+        return this._handle!;
     }
 
     static create<T>(id: number, target: object, handle: EventHandle<T>): EventHandleTarget<T> {

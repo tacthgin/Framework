@@ -1,4 +1,5 @@
 import { GameFrameworkError } from "../GameFrameworkError";
+import { LinkedListNode } from "../GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../GameFrameworkMap";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 import { BaseEventArgs } from "./BaseEventArgs";
@@ -19,7 +20,7 @@ export class EventPool<T extends BaseEventArgs> {
     update(elapseSeconds: number): void {
         if (this._events.length > 0) {
             let event: Event<T> = this._events.pop()!;
-            this.handleEvent(event.sender!, event.eventArgs!);
+            this.handleEvent(event.sender, event.eventArgs);
         }
     }
 
@@ -55,8 +56,8 @@ export class EventPool<T extends BaseEventArgs> {
             });
             if (node) {
                 eventHandleTargetList.remove(node);
-                this._targetHandles.delete(node.value!.target!, node.value!);
-                this.releaseEventHandleTarget(node.value!);
+                this._targetHandles.delete(node.value.target, node.value);
+                this.releaseEventHandleTarget(node.value);
             }
         }
     }
@@ -64,9 +65,9 @@ export class EventPool<T extends BaseEventArgs> {
     unsubscribeTarget(target: object): void {
         let eventHandleTargetList = this._targetHandles.get(target);
         if (eventHandleTargetList) {
-            eventHandleTargetList.forEach((eventHandleTarget: EventHandleTarget<T>) => {
-                this._eventHandles.delete(eventHandleTarget.id!, eventHandleTarget);
-                this.releaseEventHandleTarget(eventHandleTarget);
+            eventHandleTargetList.forEach((node: LinkedListNode<EventHandleTarget<T>>) => {
+                this._eventHandles.delete(node.value.id, node.value);
+                this.releaseEventHandleTarget(node.value);
             });
             this._targetHandles.delete(target);
         }
@@ -105,12 +106,8 @@ export class EventPool<T extends BaseEventArgs> {
     private handleEvent(sender: object, e: T): void {
         let eventHandleTargetList = this._eventHandles.get(e.id);
         if (eventHandleTargetList) {
-            eventHandleTargetList.forEach((eventHandleTarget: EventHandleTarget<T>) => {
-                if (eventHandleTarget.target) {
-                    eventHandleTarget.handle?.call(eventHandleTarget.target, sender, e);
-                } else {
-                    eventHandleTarget.handle!(sender, e);
-                }
+            eventHandleTargetList.forEach((node: LinkedListNode<EventHandleTarget<T>>) => {
+                node.value.handle.call(node.value.target, sender, e);
             });
         } else {
             throw new GameFrameworkError(`event id:${e.id} has not event handle`);

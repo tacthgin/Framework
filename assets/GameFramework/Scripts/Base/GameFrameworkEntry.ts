@@ -20,9 +20,9 @@ export class GameFrameworkEntry {
 
     static getModule<T>(): T | null {
         for (let listNode of this.s_gameFrameworkModules) {
-            let interfaceFlag = this.s_gameFrameworkModulesConstrustor.get(listNode.value!.constructor as Constructor);
-            if (interfaceFlag && this.isInterface<T>(listNode.value!, interfaceFlag)) {
-                return listNode.value! as T;
+            let interfaceFlag = this.s_gameFrameworkModulesConstrustor.get(listNode.value.constructor as Constructor);
+            if (interfaceFlag && this.isInterface<T>(listNode.value, interfaceFlag)) {
+                return listNode.value as T;
             }
         }
         return null;
@@ -37,7 +37,7 @@ export class GameFrameworkEntry {
         let node: LinkedListNode<GameFrameworkModule> | null = null;
         if (this.s_gameFrameworkModules.size > 0) {
             for (let listNode of this.s_gameFrameworkModules) {
-                if (module.priority >= listNode.value!.priority) {
+                if (module.priority >= listNode.value.priority) {
                     node = listNode;
                     break;
                 }

@@ -28,12 +28,12 @@ export class LinkedListNode<T> {
         return this._previous;
     }
 
-    set value(value: T | null) {
+    set value(value: T) {
         this._value = value;
     }
 
-    get value(): T | null {
-        return this._value;
+    get value(): T {
+        return this._value!;
     }
 
     clear() {
@@ -113,7 +113,7 @@ export class GameFrameworkLinkedList<T> {
     find(compareToFn: (value: T) => boolean, thisArg?: any): LinkedListNode<T> | null {
         let current = this._first;
         while (current) {
-            if (compareToFn.call(thisArg, current.value!)) {
+            if (compareToFn.call(thisArg, current.value)) {
                 return current;
             }
             current = current.next;
@@ -131,7 +131,7 @@ export class GameFrameworkLinkedList<T> {
     lastFind(compareToFn: (value: T) => boolean, thisArg?: any): LinkedListNode<T> | null {
         let current = this._last;
         while (current) {
-            if (compareToFn.call(thisArg, current.value!)) {
+            if (compareToFn.call(thisArg, current.value)) {
                 return current;
             }
             current = current.previous;

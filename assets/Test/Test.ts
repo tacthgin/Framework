@@ -61,7 +61,7 @@ export class Test extends Component {
             key[1].printList();
         }
 
-        find("test2", this.node)?.getComponent(Test2)?.setCallback(this.testa);
+        find("test2", this.node)?.getComponent(Test2)?.setCallback(this.testa.bind(this));
 
         console.log(this.testa, this.testa.bind(this), this.testa == this.testa);
         // let list = new GameFrameworkLinkedList<number>();

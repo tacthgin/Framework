@@ -6,12 +6,12 @@ export class Event<T extends BaseEventArgs> implements IRerference {
     private _sender: object | null = null;
     private _eventArgs: T | null = null;
 
-    get sender(): object | null {
-        return this._sender;
+    get sender(): object {
+        return this._sender!;
     }
 
-    get eventArgs(): T | null {
-        return this._eventArgs;
+    get eventArgs(): T {
+        return this._eventArgs!;
     }
 
     static create<T extends BaseEventArgs>(sender: object, eventArgs: T): Event<T> {
