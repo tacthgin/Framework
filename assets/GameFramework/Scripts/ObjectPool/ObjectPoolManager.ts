@@ -44,6 +44,9 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         this._objectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
             objectPool.shutDown();
         });
+        this._objectPools.clear();
+        this._cachedAllObjectPools.length = 0;
+        this._constructorToPairMap.clear();
     }
 
     hasObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): boolean {

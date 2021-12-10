@@ -8,6 +8,20 @@ export class GameFrameworkEntry {
     private static s_gameFrameworkModulesConstrustor: Map<string, Constructor> = new Map<string, Constructor>();
     private static s_cachedGameFrameworkModule: Map<string, GameFrameworkModule> = new Map<string, GameFrameworkModule>();
 
+    static update(elapseSeconds: number): void {
+        this.s_gameFrameworkModules.forEach((node: LinkedListNode<GameFrameworkModule>) => {
+            node.value.update(elapseSeconds);
+        });
+    }
+
+    static shutDown(): void {
+        for (let current = this.s_gameFrameworkModules.last; current != null; current = current.previous) {
+            current.value.shutDown();
+        }
+        this.s_cachedGameFrameworkModule.clear();
+        this.s_gameFrameworkModulesConstrustor.clear();
+    }
+
     static registerModule(className: string): (target: Constructor) => void {
         return (target: Constructor) => {
             this.s_gameFrameworkModulesConstrustor.set(className, target);
