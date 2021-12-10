@@ -1,4 +1,4 @@
-import { Component, find, _decorator } from "cc";
+import { Component, find, resources, Sprite, SpriteFrame, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
@@ -36,8 +36,15 @@ class C<T> {}
 @ccclass("Test")
 export class Test extends Component {
     private a: number = 1;
+    @property(Sprite)
+    private testSp: Sprite = null!;
+
     start() {
         GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
+        resources.loadDir("1", SpriteFrame, (err, asset) => {
+            console.log(asset, resources);
+            this.testSp.spriteFrame = resources.get<SpriteFrame>("1/player_down_1/spriteFrame");
+        });
     }
 
     onCallback(sender: object, e: any) {
