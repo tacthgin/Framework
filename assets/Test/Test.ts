@@ -44,6 +44,15 @@ export class Test extends Component {
         resources.loadDir("1", (err, assets) => {
             console.log(resources);
         });
+
+        let obj = {
+            hello: "world",
+            "1": "2",
+        };
+
+        for (let key in obj) {
+            console.log(key);
+        }
     }
 
     onCallback(sender: object, e: any) {

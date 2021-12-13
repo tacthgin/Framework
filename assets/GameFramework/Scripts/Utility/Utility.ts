@@ -1,4 +1,5 @@
 import { DateUtility } from "./DateUtility";
+import { JsonUtility } from "./JsonUtility";
 import { MathUtility } from "./MathUtility";
 import { Random } from "./Random";
 import { SystemUtility } from "./SystemUtility";
@@ -17,5 +18,5 @@ export class Utility {
     /** 文本工具类 */
     static readonly Text: TextUtility = new TextUtility();
     /** Json工具类 */
-    static readonly Json: TextUtility = new TextUtility();
+    static readonly Json: JsonUtility = new JsonUtility();
 }
