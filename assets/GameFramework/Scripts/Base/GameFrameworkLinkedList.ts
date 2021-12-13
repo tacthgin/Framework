@@ -341,12 +341,7 @@ export class GameFrameworkLinkedList<T> {
         this._last = this._first = newNode;
     }
 
-    printList() {
-        let current = this._first;
-        while (current) {
-            console.log(current.value, "front:", current.previous && current.previous.value, "back:", current.next && current.next.value);
-            current = current.next;
-        }
-        console.log("****************************");
+    get [Symbol.toStringTag](): string {
+        return "GameFrameworkLinkedList";
     }
 }

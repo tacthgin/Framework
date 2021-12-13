@@ -20,6 +20,7 @@ export class GameFrameworkEntry {
         }
         this.s_cachedGameFrameworkModule.clear();
         this.s_gameFrameworkModulesConstrustor.clear();
+        this.s_gameFrameworkModules.clear();
     }
 
     static registerModule(className: string): (target: Constructor) => void {

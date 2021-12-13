@@ -1,4 +1,4 @@
-import { Component, find, resources, Sprite, SpriteFrame, _decorator } from "cc";
+import { assetManager, Component, find, resources, Sprite, SpriteFrame, _decorator } from "cc";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
@@ -41,9 +41,8 @@ export class Test extends Component {
 
     start() {
         GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
-        resources.loadDir("1", SpriteFrame, (err, asset) => {
-            console.log(asset, resources);
-            this.testSp.spriteFrame = resources.get<SpriteFrame>("1/player_down_1/spriteFrame");
+        resources.loadDir("1", (err, assets) => {
+            console.log(resources);
         });
     }
 
@@ -51,14 +50,10 @@ export class Test extends Component {
         console.log("receive sender", sender, e);
     }
 
-    testb(object: any) {}
+    testb() {}
 
     testa() {
         ++this.a;
         console.log("a", this, this.a);
-    }
-
-    isString(test: any): test is A {
-        return typeof test === "string";
     }
 }

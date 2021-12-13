@@ -1,65 +1,125 @@
-import { Asset, AssetManager } from "cc";
+import { Asset, assetManager, AssetManager } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
+import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
 import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
 
-export class ResourceLoader {
+export class ResourceLoader implements IResourceLoader {
     private _resourceLoaderHelp: IResourceLoaderHelp = null!;
-    private _cachedAssets: Map<Constructor<Asset>, Map<string, Asset>> = null!;
+    private _cachedDirs: Map<string, Array<Asset>> = null!;
 
     constructor(resourceLoaderHelp: IResourceLoaderHelp) {
         this._resourceLoaderHelp = resourceLoaderHelp;
-        this._cachedAssets = new Map<Constructor<Asset>, Map<string, Asset>>();
+        this._cachedDirs = new Map<string, Array<Asset>>();
     }
 
-    loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null> {
-        return new Promise<T | null>((resolve) => {
-            this._resourceLoaderHelp.load(path, assetType, null, (err: Error, data: T) => {
-                if (err) {
-                    GameFrameworkLog.error(err.message);
-                    resolve(null);
-                    return;
-                }
-                resolve(data);
-            });
-        });
+    shutDown(): void {
+        this._cachedDirs.clear();
     }
 
-    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>): Promise<T | null> {
+    loadAsset<T extends Asset>(path: string, assetType: Constructor<T>): Promise<T | null> {
         return new Promise<T | null>((resolve) => {
-            this._resourceLoaderHelp.load(
-                path,
-                assetType,
-                (finished: number, total: number, item: AssetManager.RequestItem) => {
-                    onProgress && onProgress(finished, total, item);
-                },
-                (err: Error, data: T) => {
+            let asset = this._resourceLoaderHelp.get(path, assetType);
+            if (asset) {
+                resolve(asset);
+            } else {
+                this._resourceLoaderHelp.load(path, assetType, null, (err: Error | null, data: T) => {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(null);
+                        return;
                     }
                     resolve(data);
-                    onComplete && onComplete(err, data);
-                }
-            );
+                });
+            }
         });
     }
 
-    loadDir<T>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>) {}
-
-    private getAssetMap(assetConstructor: Constructor<Asset>): Map<string, Asset> {
-        if (!assetConstructor) {
-            throw new GameFrameworkError("assetConstructor is invalid");
-        }
-        let assetMap = this._cachedAssets.get(assetConstructor);
-        if (!assetMap) {
-            assetMap = new Map<string, Asset>();
-            this._cachedAssets.set(assetConstructor, assetMap);
-        }
-        return assetMap;
+    loadAssetWithCallback<T extends Asset>(path: string, assetType: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            let asset = this._resourceLoaderHelp.get(path, assetType);
+            if (asset) {
+                onComplete && onComplete(null!, asset);
+                resolve(true);
+            } else {
+                this._resourceLoaderHelp.load(
+                    path,
+                    assetType,
+                    (finished: number, total: number, item: AssetManager.RequestItem) => {
+                        onProgress && onProgress(finished, total, item);
+                    },
+                    (err: Error | null, data: T) => {
+                        onComplete && onComplete(err, data);
+                        resolve(true);
+                    }
+                );
+            }
+        });
     }
 
-    private defaultCompleteCallback<T>(err: Error, data: T) {}
+    loadDir<T extends Asset>(path: string, assetType: Constructor<T>): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            let result = this._cachedDirs.get(path);
+            if (result) {
+                resolve(true);
+            } else {
+                this._resourceLoaderHelp.loadDir(path, assetType, null, (err: Error | null, data: T[]) => {
+                    if (err) {
+                        GameFrameworkLog.error(err.message);
+                        resolve(false);
+                    } else {
+                        this._cachedDirs.set(path, data);
+                        resolve(true);
+                    }
+                });
+            }
+        });
+    }
+
+    loadDirWithCallback<T extends Asset>(path: string, assetType: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T[]>): Promise<boolean> {
+        return new Promise<boolean>((resolve) => {
+            let result = this._cachedDirs.get(path);
+            if (result) {
+                resolve(true);
+            } else {
+                this._resourceLoaderHelp.loadDir(
+                    path,
+                    assetType,
+                    (finished: number, total: number, item: AssetManager.RequestItem) => {
+                        onProgress && onProgress(finished, total, item);
+                    },
+                    (err: Error | null, data: T[]) => {
+                        if (!err) {
+                            this._cachedDirs.set(path, data);
+                        }
+                        onComplete && onComplete(err, data);
+                        resolve(!!err);
+                    }
+                );
+            }
+        });
+    }
+
+    getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null {
+        return this._resourceLoaderHelp.get(path, assetType);
+    }
+
+    releaseDir(path: string): void {
+        let assets = this._cachedDirs.get(path);
+        if (assets) {
+            assets.forEach((asset) => {
+                this.releaseAsset(asset);
+            });
+            this._cachedDirs.delete(path);
+        }
+    }
+
+    releaseAsset(asset: Asset): void {
+        if (!asset) {
+            throw new GameFrameworkError("asset is invalid");
+        }
+        assetManager.releaseAsset(asset);
+    }
 }
