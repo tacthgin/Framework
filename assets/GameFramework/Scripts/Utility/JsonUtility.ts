@@ -1,7 +1,7 @@
 import { JsonAsset } from "cc";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { IResourceManager } from "../Resource/IResourceManager";
-import { Utility } from "./Utility";
+import { SystemUtility } from "./SystemUtility";
 
 /**
  * Json工具类
@@ -10,6 +10,7 @@ export class JsonUtility {
     private _resourceManger: IResourceManager = null!;
     private _jsonDirPath: string = "";
     private _cacheJsonKeyMap: Map<string, Map<string, Map<number | string, object>>> = null!;
+    private _systemUtility: SystemUtility = null!;
 
     constructor() {
         this._cacheJsonKeyMap = new Map<string, Map<string, Map<number | string, object>>>();
@@ -21,6 +22,14 @@ export class JsonUtility {
      */
     setResourceManager(resourceManger: IResourceManager): void {
         this._resourceManger = resourceManger;
+    }
+
+    /**
+     * 设置系统工具类
+     * @param systemUtility
+     */
+    setSystemUtility(systemUtility: SystemUtility): void {
+        this._systemUtility = systemUtility;
     }
 
     /**
@@ -40,7 +49,7 @@ export class JsonUtility {
     getJson(path: string, clone: boolean = false): object | null {
         let jsonAsset = this._resourceManger.internalResourceLoader.getAsset(`${this._jsonDirPath}/${path}`, JsonAsset);
         if (jsonAsset) {
-            return clone ? Utility.System.clone(jsonAsset.json) || null : jsonAsset.json;
+            return clone ? this._systemUtility.clone(jsonAsset.json) || null : jsonAsset.json;
         } else {
             throw new GameFrameworkError(`can't find json ${path}`);
         }
@@ -58,7 +67,7 @@ export class JsonUtility {
         if (json) {
             let member = (json as any)[elementName];
             if (member) {
-                return clone ? Utility.System.clone(member) : member;
+                return clone ? this._systemUtility.clone(member) : member;
             }
             return null;
         } else {
