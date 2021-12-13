@@ -1,5 +1,4 @@
 import { IResourceLoader } from "./IResourceLoader";
-import { ResourceLoader } from "./ResourceLoader";
 
 export interface IResourceManager {
     /**
@@ -7,5 +6,9 @@ export interface IResourceManager {
      */
     readonly internalResourceLoader: IResourceLoader;
 
+    /**
+     * 获取资源加载器
+     * @param name
+     */
     getResourceLoader(name: string): IResourceLoader | null;
 }
