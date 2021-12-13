@@ -66,6 +66,13 @@ export class JsonUtility {
         }
     }
 
+    /**
+     * 根据json元素名字的值索引json元素
+     * @param path json路径，不需要根json文件夹
+     * @param key json元素名字
+     * @param value json元素的值
+     * @returns json元素
+     */
     getJsonKeyCache(path: string, key: string, value: number | string): object | null {
         let json: any = this.getJson(path);
         if (json) {
@@ -76,6 +83,13 @@ export class JsonUtility {
         }
     }
 
+    /**
+     * 内部获得json的key缓存
+     * @param json
+     * @param path
+     * @param key
+     * @returns
+     */
     private internalGetJsonKeyCache(json: object, path: string, key: string): Map<number | string, object> {
         let jsonCache = this._cacheJsonKeyMap.get(path);
         if (!jsonCache) {
