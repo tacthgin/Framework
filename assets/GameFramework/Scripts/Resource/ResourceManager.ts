@@ -83,16 +83,26 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         return this._remoteAssets.get(url) || null;
     }
 
+    releaseAsset(asset: Asset): void {
+        if (!asset) {
+            throw new GameFrameworkError("asset is invalid");
+        }
+        assetManager.releaseAsset(asset);
+    }
+
     private createResourceLoader(name: string, bundle: IResourceLoaderHelp): void {
         let resourceLoader = this._resourceLoaders.get(name);
         if (resourceLoader) {
             throw new GameFrameworkError(`has exist resource loader ${name}`);
         }
-        resourceLoader = new ResourceLoader(bundle);
+        resourceLoader = new ResourceLoader(bundle, this);
         this._resourceLoaders.set(name, resourceLoader);
     }
 
     private getBundleName(bundleNameOrUrl: string): string {
-        return "";
+        if (bundleNameOrUrl.startsWith("http")) {
+            return bundleNameOrUrl.substring(bundleNameOrUrl.lastIndexOf("/") + 1);
+        }
+        return bundleNameOrUrl;
     }
 }

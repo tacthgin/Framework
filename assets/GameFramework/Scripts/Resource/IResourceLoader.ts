@@ -48,10 +48,4 @@ export interface IResourceLoader {
      * @param path 文件夹路径
      */
     releaseDir(path: string): void;
-
-    /**
-     * 释放资源，有依赖的资源可能不会释放
-     * @param asset
-     */
-    releaseAsset(asset: Asset): void;
 }

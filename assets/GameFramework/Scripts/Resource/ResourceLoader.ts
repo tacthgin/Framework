@@ -4,14 +4,17 @@ import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
+import { IResourceManager } from "./IResourceManager";
 import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
 
 export class ResourceLoader implements IResourceLoader {
     private _resourceLoaderHelp: IResourceLoaderHelp = null!;
     private _cachedDirs: Map<string, Array<Asset>> = null!;
+    private _resourceManger: IResourceManager = null!;
 
-    constructor(resourceLoaderHelp: IResourceLoaderHelp) {
+    constructor(resourceLoaderHelp: IResourceLoaderHelp, resourceManager: IResourceManager) {
         this._resourceLoaderHelp = resourceLoaderHelp;
+        this._resourceManger = resourceManager;
         this._cachedDirs = new Map<string, Array<Asset>>();
     }
 
@@ -110,16 +113,9 @@ export class ResourceLoader implements IResourceLoader {
         let assets = this._cachedDirs.get(path);
         if (assets) {
             assets.forEach((asset) => {
-                this.releaseAsset(asset);
+                this._resourceManger.releaseAsset(asset);
             });
             this._cachedDirs.delete(path);
         }
-    }
-
-    releaseAsset(asset: Asset): void {
-        if (!asset) {
-            throw new GameFrameworkError("asset is invalid");
-        }
-        assetManager.releaseAsset(asset);
     }
 }
