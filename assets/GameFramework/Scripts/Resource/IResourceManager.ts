@@ -1,4 +1,14 @@
+import { Asset } from "cc";
 import { IResourceLoader } from "./IResourceLoader";
+
+export interface OptionExt {
+    ext?: string;
+}
+
+export interface OptionBundle {
+    version?: string;
+    scriptAsyncLoading?: boolean;
+}
 
 export interface IResourceManager {
     /**
@@ -7,8 +17,28 @@ export interface IResourceManager {
     readonly internalResourceLoader: IResourceLoader;
 
     /**
+     * 加载bundle，返回bundle的资源加载器
+     * @param bundleNameOrUrl bundle名字或者url
+     * @param options bundle附加选项
+     */
+    loadBundle(bundleNameOrUrl: string, options?: OptionBundle): Promise<IResourceLoader | null>;
+
+    /**
      * 获取资源加载器
      * @param name
      */
     getResourceLoader(name: string): IResourceLoader | null;
+
+    /**
+     * 加载远程资源
+     * @param url 远程资源url
+     * @param options 远程资源附加扩展名
+     */
+    loadRemote(url: string, options?: OptionExt): Promise<Asset | null>;
+
+    /**
+     * 获取远程资源
+     * @param url 远程资源url
+     */
+    getRemoteAsset(url: string): Asset | null;
 }

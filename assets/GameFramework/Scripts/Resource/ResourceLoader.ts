@@ -29,9 +29,9 @@ export class ResourceLoader implements IResourceLoader {
                     if (err) {
                         GameFrameworkLog.error(err.message);
                         resolve(null);
-                        return;
+                    } else {
+                        resolve(data);
                     }
-                    resolve(data);
                 });
             }
         });
@@ -41,7 +41,7 @@ export class ResourceLoader implements IResourceLoader {
         return new Promise<boolean>((resolve) => {
             let asset = this._resourceLoaderHelp.get(path, assetType);
             if (asset) {
-                onComplete && onComplete(null!, asset);
+                onComplete && onComplete(null, asset);
                 resolve(true);
             } else {
                 this._resourceLoaderHelp.load(
