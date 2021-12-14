@@ -23,7 +23,7 @@ export class Random {
     }
 
     /**
-     * 根据随机种子范围随机
+     * 根据随机种子范围随机，这个值不小于 min（有可能等于），并且小于（不等于）max
      * @param min 最小值
      * @param max 最大值
      * @returns  随机到的任意数
