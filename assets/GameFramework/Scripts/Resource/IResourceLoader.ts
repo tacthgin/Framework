@@ -2,6 +2,9 @@ import { Asset } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { ResourceCompleteCallback, ResourceProgressCallback } from "./ResourceCallback";
 
+/**
+ * 资源加载器，基于bundle实现
+ */
 export interface IResourceLoader {
     /**
      * 使用Promise加载单一资源

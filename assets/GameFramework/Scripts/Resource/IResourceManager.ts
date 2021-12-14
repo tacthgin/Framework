@@ -10,6 +10,9 @@ export interface OptionBundle {
     scriptAsyncLoading?: boolean;
 }
 
+/**
+ * 资源管理
+ */
 export interface IResourceManager {
     /**
      * 内置的动态resources加载

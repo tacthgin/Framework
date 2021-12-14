@@ -14,6 +14,10 @@ export class EventManager extends GameFrameworkModule implements IEventManager {
         this._eventPool = new EventPool<GameEventArgs>();
     }
 
+    get priority(): number {
+        return 6;
+    }
+
     update(elapseSeconds: number): void {
         this._eventPool.update(elapseSeconds);
     }
