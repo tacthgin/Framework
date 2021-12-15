@@ -1,38 +1,77 @@
 import { ISoundAgent } from "./ISoundAgent";
+import { ISoundAgentHelp } from "./ISoundAgentHelp";
 import { ISoundGroup } from "./ISoundGroup";
 
 export class SoundAgent implements ISoundAgent {
+    private _soundGroup: ISoundGroup = null!;
+    private _soundAgentHelp: ISoundAgentHelp = null!;
+    private _soundId: number = 0;
     private _soundAsset: object | null = null;
-    
-    constructor() {}
+    private _muteInSoundGroup: boolean = false;
+    private _volumeInSoundGroup: number = 1;
 
-    get soundGroup(): ISoundGroup {}
+    constructor(soundGroup: ISoundGroup, soundAgentHelp: ISoundAgentHelp) {
+        this._soundGroup = soundGroup;
+        this._soundAgentHelp = soundAgentHelp;
+    }
 
-    get soundId(): number {}
+    get soundGroup(): ISoundGroup {
+        return this._soundGroup;
+    }
 
-    get isPlaying(): boolean {}
+    get soundId(): number {
+        return this._soundId;
+    }
 
-    get length(): number {}
+    get isPlaying(): boolean {
+        return this._soundAgentHelp.isPlaying;
+    }
 
-    set time(value: number) {}
+    get length(): number {
+        return this._soundAgentHelp.length;
+    }
 
-    get time(): number {}
+    set time(value: number) {
+        this._soundAgentHelp.time = value;
+    }
 
-    get mute(): boolean {}
+    get time(): number {
+        return this._soundAgentHelp.time;
+    }
 
-    set muteInSoundGroup(value: boolean) {}
+    get mute(): boolean {
+        return this._soundAgentHelp.mute;
+    }
 
-    get muteInSoundGroup(): boolean {}
+    set muteInSoundGroup(value: boolean) {
+        this._muteInSoundGroup = value;
+        this.refreshMute();
+    }
 
-    set loop(value: boolean) {}
+    get muteInSoundGroup(): boolean {
+        return this._muteInSoundGroup;
+    }
 
-    get loop(): boolean {}
+    set loop(value: boolean) {
+        this._soundAgentHelp.loop = value;
+    }
 
-    get volume(): number {}
+    get loop(): boolean {
+        return this._soundAgentHelp.loop;
+    }
 
-    set volumeInSoundGroup(value: number) {}
+    get volume(): number {
+        return this._soundAgentHelp.volume;
+    }
 
-    get volumeInSoundGroup(): number {}
+    set volumeInSoundGroup(value: number) {
+        this._volumeInSoundGroup = value;
+        this.refreshVolume();
+    }
+
+    get volumeInSoundGroup(): number {
+        return this._volumeInSoundGroup;
+    }
 
     play(): void {
         throw new Error("Method not implemented.");
@@ -48,5 +87,13 @@ export class SoundAgent implements ISoundAgent {
 
     pause(): void {
         throw new Error("Method not implemented.");
+    }
+
+    refreshMute() {
+        this._soundAgentHelp.mute = this._soundGroup.mute || this._muteInSoundGroup;
+    }
+
+    refreshVolume() {
+        this._soundAgentHelp.volume = this._soundGroup.volume * this._volumeInSoundGroup;
     }
 }
