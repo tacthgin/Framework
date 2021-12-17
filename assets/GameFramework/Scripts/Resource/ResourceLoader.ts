@@ -43,7 +43,7 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>): Promise<boolean> {
+    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T> | null): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             path = this._resoucePathHelp.getPath(path, assetType);
             let asset = this._resourceLoaderHelp.get(path, assetType);
@@ -85,7 +85,7 @@ export class ResourceLoader implements IResourceLoader {
         });
     }
 
-    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T[]>): Promise<boolean> {
+    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback | null, onComplete?: ResourceCompleteCallback<T[]> | null): Promise<boolean> {
         return new Promise<boolean>((resolve) => {
             let result = this._cachedDirs.get(path);
             if (result) {
@@ -110,6 +110,7 @@ export class ResourceLoader implements IResourceLoader {
     }
 
     getAsset<T extends Asset>(path: string, assetType?: Constructor<T>): T | null {
+        path = this._resoucePathHelp.getPath(path, assetType);
         return this._resourceLoaderHelp.get(path, assetType);
     }
 

@@ -57,10 +57,10 @@ export class Test extends Component {
     }
 
     async testC() {
-        // console.log(Date.now());
-        // console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame));
-        let sp = await GameApp.ResourceManager.internalResourceLoader.loadAsset("1/player_down_0", SpriteFrame);
-        console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame), sp);
-        // console.log(Date.now());
+        console.log(Date.now());
+        let sp = await GameApp.ResourceManager.internalResourceLoader.loadAssetWithCallback("1/player_down_0", SpriteFrame, null, (err, data) => {
+            console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame), data);
+        });
+        console.log(Date.now());
     }
 }
