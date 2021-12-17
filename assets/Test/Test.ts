@@ -1,4 +1,5 @@
 import { assetManager, Component, find, resources, Sprite, SpriteFrame, _decorator } from "cc";
+import { GameApp } from "../GameFramework/Scripts/Application/GameApp";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
@@ -40,19 +41,8 @@ export class Test extends Component {
     private testSp: Sprite = null!;
 
     start() {
-        GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
-        resources.loadDir("1", (err, assets) => {
-            console.log(resources);
-        });
-
-        let obj = {
-            hello: "world",
-            "1": "2",
-        };
-
-        for (let key in obj) {
-            console.log(key);
-        }
+        //GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
+        this.testC();
     }
 
     onCallback(sender: object, e: any) {
@@ -64,5 +54,13 @@ export class Test extends Component {
     testa() {
         ++this.a;
         console.log("a", this, this.a);
+    }
+
+    async testC() {
+        // console.log(Date.now());
+        // console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame));
+        let sp = await GameApp.ResourceManager.internalResourceLoader.loadAsset("1/player_down_0", SpriteFrame);
+        console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame), sp);
+        // console.log(Date.now());
     }
 }

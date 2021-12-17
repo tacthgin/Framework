@@ -1,10 +1,12 @@
 import { AudioClip } from "cc";
+import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISoundManager } from "./ISoundManager";
 import { SoundGroup } from "./SoundGroup";
 
+@GameFrameworkEntry.registerModule("SoundManager")
 export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private _soundGroups: Map<string, SoundGroup> = null!;
     private _resourceManager: IResourceManager = null!;

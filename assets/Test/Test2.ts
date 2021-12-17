@@ -17,9 +17,9 @@ export class Test2 extends Component {
     private callback: Function | null = null;
 
     start() {
-        this.scheduleOnce(() => {
-            GameFrameworkEntry.getModule<IEventManager>("EventManager").fireNow(this, new CustomEventArgs());
-        }, 5);
+        // this.scheduleOnce(() => {
+        //     GameFrameworkEntry.getModule<IEventManager>("EventManager").fireNow(this, new CustomEventArgs());
+        // }, 5);
     }
 
     setCallback(callback: Function, thisArg?: any) {
