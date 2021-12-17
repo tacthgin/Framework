@@ -1,8 +1,11 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { ISoundGroup } from "./ISoundGroup";
+import { ISoundHelp } from "./ISoundHelp";
+import { PlaySoundParams } from "./PlaySoundParams";
 import { SoundAgent } from "./SoundAgent";
 
 export class SoundGroup implements ISoundGroup {
+    private _soundHelp: ISoundHelp | null = null;
     private _name: string = "";
     private _soundAgents: Array<SoundAgent> = null!;
     private _mute: boolean = false;
@@ -40,7 +43,36 @@ export class SoundGroup implements ISoundGroup {
         return this._volume;
     }
 
+    addSoundHelp(soundHelp: ISoundHelp) {
+        this._soundHelp = soundHelp;
+    }
+
+    playSound(soundId: number, soundAsset: object, playSoundParams: PlaySoundParams) {
+        let candidateAgent: SoundAgent | null = null;
+        for (let soundAgent of this._soundAgents) {
+            if (!soundAgent.isPlaying) {
+                candidateAgent = soundAgent;
+                break;
+            }
+        }
+
+        if (candidateAgent && candidateAgent.setSoundAsset(soundAsset)) {
+            candidateAgent.soundId = soundId
+            candidateAgent.volume = playSoundParams.volume
+            candidateAgent.loop = playSoundParams.loop
+            candidateAgent.play()
+        }
+    }
+
+    pauseSound(soundId: number) {}
+
+    resumeSound(soundId: number) {}
+
+    stopSound(soundId: number) {}
+
     stopAllLoadedSounds(): void {
-        
+        this._soundAgents.forEach((soundAgent: SoundAgent) => {
+            soundAgent.stop();
+        });
     }
 }
