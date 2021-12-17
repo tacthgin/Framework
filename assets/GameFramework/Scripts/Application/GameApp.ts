@@ -1,6 +1,7 @@
 import { Component, game, _decorator } from "cc";
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
+import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { WebLogHelp } from "../Base/Log/WebLogHelp";
 import { IEventManager } from "../Event/IEventManager";
@@ -11,13 +12,15 @@ import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
 import { IModel } from "./Model/IModel";
 import { ModelContainer } from "./Model/ModelContainer";
+import { SoundController } from "./Sound/SoundController";
 
-const { ccclass } = _decorator;
+const { ccclass, executionOrder } = _decorator;
 
 /**
  * 应用游戏入口
  */
 @ccclass("GameApp")
+@executionOrder(1)
 export class GameApp extends Component {
     private static _instance: GameApp | null = null;
     private _modelContainer: ModelContainer = null!;
@@ -96,7 +99,14 @@ export class GameApp extends Component {
         GameFrameworkLog.setLogHelp(new WebLogHelp());
         let resourceManager = GameApp.ResourceManager;
         GameApp.UIManager.setResourceManager(resourceManager);
-        GameApp.SoundManager.setResourceManager(resourceManager);
+        let soundManager = GameApp.SoundManager;
+        soundManager.setResourceManager(resourceManager);
+        let soundController = this.getComponent(SoundController);
+        if (soundController) {
+            soundManager.setSoundHelp(soundController);
+        } else {
+            throw new GameFrameworkError("sound controller is invalid");
+        }
         Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
     }
