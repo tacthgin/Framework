@@ -3,7 +3,7 @@ import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
-import { CommonResourcePathHelp } from "./CommonResourcePathHelp";
+import { ResourcePathHelp } from "./ResourcePathHelp";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
 import { IResourceManager, OptionBundle, OptionExt } from "./IResourceManager";
@@ -20,7 +20,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, Asset>();
-        this._resourceHelpPath = new CommonResourcePathHelp();
+        this._resourceHelpPath = new ResourcePathHelp();
         this.createResourceLoader("resources", resources);
     }
 
