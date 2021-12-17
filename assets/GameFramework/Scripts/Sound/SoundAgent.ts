@@ -23,6 +23,10 @@ export class SoundAgent implements ISoundAgent {
         return this._soundId;
     }
 
+    set soundId(value: number) {
+        this._soundId = value;
+    }
+
     get isPlaying(): boolean {
         return this._soundAgentHelp.isPlaying;
     }
@@ -74,19 +78,24 @@ export class SoundAgent implements ISoundAgent {
     }
 
     play(): void {
-        throw new Error("Method not implemented.");
+        this._soundAgentHelp.play();
     }
 
     stop(): void {
-        throw new Error("Method not implemented.");
+        this._soundAgentHelp.stop();
     }
 
     resume(): void {
-        throw new Error("Method not implemented.");
+        this._soundAgentHelp.resume();
     }
 
     pause(): void {
-        throw new Error("Method not implemented.");
+        this._soundAgentHelp.pause();
+    }
+
+    setSoundAsset(soundAsset: object): boolean {
+        this._soundAsset = soundAsset;
+        return this._soundAgentHelp.setSoundAsset(soundAsset);
     }
 
     refreshMute() {
