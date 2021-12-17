@@ -11,7 +11,7 @@ export interface IResourceLoader {
      * @param path 资源路径
      * @param assetType 资源类型
      */
-    loadAsset<T extends Asset>(path: string, assetType: Constructor<T>): Promise<T | null>;
+    loadAsset<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<T | null>;
 
     /**
      * 使用回调方式加载单一资源
@@ -20,7 +20,7 @@ export interface IResourceLoader {
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源加载完成回调
      */
-    loadAssetWithCallback<T extends Asset>(path: string, assetType: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>): Promise<boolean>;
+    loadAssetWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T>): Promise<boolean>;
 
     /**
      * 加载文件夹资源
@@ -28,7 +28,7 @@ export interface IResourceLoader {
      * @param assetType 资源类型
      * @returns 是否加载成功
      */
-    loadDir<T extends Asset>(path: string, assetType: Constructor<T>): Promise<boolean>;
+    loadDir<T extends Asset>(path: string, assetType?: Constructor<T>): Promise<boolean>;
 
     /**
      * 使用回调方式加载文件夹资源
@@ -37,7 +37,7 @@ export interface IResourceLoader {
      * @param onProgress 资源加载进度回调
      * @param onComplete 资源加载完成回调
      */
-    loadDirWithCallback<T extends Asset>(path: string, assetType: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T[]>): Promise<boolean>;
+    loadDirWithCallback<T extends Asset>(path: string, assetType?: Constructor<T>, onProgress?: ResourceProgressCallback, onComplete?: ResourceCompleteCallback<T[]>): Promise<boolean>;
 
     /**
      * 获取已经缓存的资源

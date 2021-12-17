@@ -1,20 +1,26 @@
 import { Asset, AssetManager, assetManager, resources } from "cc";
+import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
+import { CommonResourcePathHelp } from "./CommonResourcePathHelp";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelp } from "./IResourceLoaderHelp";
 import { IResourceManager, OptionBundle, OptionExt } from "./IResourceManager";
+import { IResourcePathHelp } from "./IResourcePathHelp";
 import { ResourceLoader } from "./ResourceLoader";
 
+@GameFrameworkEntry.registerModule("ResourceManager")
 export class ResourceManager extends GameFrameworkModule implements IResourceManager {
     private _resourceLoaders: Map<string, ResourceLoader> = null!;
     private _remoteAssets: Map<string, Asset> = null!;
+    private _resourceHelpPath: IResourcePathHelp = null!;
 
     constructor() {
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
         this._remoteAssets = new Map<string, Asset>();
+        this._resourceHelpPath = new CommonResourcePathHelp();
         this.createResourceLoader("resources", resources);
     }
 
@@ -95,7 +101,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         if (resourceLoader) {
             throw new GameFrameworkError(`has exist resource loader ${name}`);
         }
-        resourceLoader = new ResourceLoader(bundle, this);
+        resourceLoader = new ResourceLoader(bundle, this._resourceHelpPath, this);
         this._resourceLoaders.set(name, resourceLoader);
     }
 
