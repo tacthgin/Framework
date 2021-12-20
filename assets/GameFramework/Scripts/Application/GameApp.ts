@@ -7,6 +7,8 @@ import { WebLogHelp } from "../Base/Log/WebLogHelp";
 import { IEventManager } from "../Event/IEventManager";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
+import { ISaveManager } from "../Save/ISaveManager";
+import { WebSaveHelp } from "../Save/WebSaveHelp";
 import { ISoundManager } from "../Sound/ISoundManager";
 import { IUIManager } from "../UI/IUIManager";
 import { Utility } from "../Utility/Utility";
@@ -65,6 +67,13 @@ export class GameApp extends Component {
     }
 
     /**
+     * 本地存储管理
+     */
+    static get SaveManager(): ISaveManager {
+        return GameFrameworkEntry.getModule<ISaveManager>("SaveManager");
+    }
+
+    /**
      * 根据构造获取模型
      * @param constructor
      * @returns
@@ -96,9 +105,11 @@ export class GameApp extends Component {
     }
 
     private initalizeFramework() {
+        //设置log辅助
         GameFrameworkLog.setLogHelp(new WebLogHelp());
         let resourceManager = GameApp.ResourceManager;
         GameApp.UIManager.setResourceManager(resourceManager);
+        //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);
         let soundController = this.getComponent(SoundController);
@@ -107,6 +118,9 @@ export class GameApp extends Component {
         } else {
             throw new GameFrameworkError("sound controller is invalid");
         }
+        //初始化存储模块
+        GameApp.SaveManager.setSaveHelp(new WebSaveHelp());
+        //初始化JSON工具类
         Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
     }

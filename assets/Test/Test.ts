@@ -3,6 +3,7 @@ import { GameApp } from "../GameFramework/Scripts/Application/GameApp";
 import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
 import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
 import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
+import { GameFrameworkError } from "../GameFramework/Scripts/Base/GameFrameworkError";
 import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
 import { GameFrameworkMap } from "../GameFramework/Scripts/Base/GameFrameworkMap";
 import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFrameworkLog";
@@ -44,6 +45,8 @@ export class Test extends Component {
         //GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
         //this.testC();
         this.testb();
+        this.testD();
+        this.testE();
     }
 
     onCallback(sender: object, e: any) {
@@ -68,5 +71,33 @@ export class Test extends Component {
             console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame), data);
         });
         console.log(Date.now());
+    }
+
+    testD() {
+        let newValue = null;
+        try {
+            newValue = JSON.stringify(1111);
+        } catch (error) {
+            console.log(error);
+            throw new GameFrameworkError("json parse failed, value is invalid");
+        }
+        console.log(newValue, typeof newValue);
+        return newValue;
+    }
+
+    testE() {
+        GameApp.SaveManager.setString("hello", "world");
+        console.log(GameApp.SaveManager.getString("hello", "world"));
+
+        GameApp.SaveManager.setObject("hello1", {
+            a: 1,
+            b: "dssss",
+            c: { a: 1 },
+        });
+
+        console.log(GameApp.SaveManager.getObject("hello1"));
+
+        GameApp.SaveManager.setNumber("hello2", 1);
+        console.log(GameApp.SaveManager.getNumber("hello2"));
     }
 }
