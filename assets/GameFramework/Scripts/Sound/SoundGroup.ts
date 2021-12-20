@@ -74,7 +74,7 @@ export class SoundGroup implements ISoundGroup {
                 candidateAgent = new SoundAgent(this, soundAgentHelp);
                 this._soundAgents.push(candidateAgent);
             } else {
-                throw new GameFrameworkError("sound help is null");
+                throw new GameFrameworkError("sound help not exist");
             }
         }
 

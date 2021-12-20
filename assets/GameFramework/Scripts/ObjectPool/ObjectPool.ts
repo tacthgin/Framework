@@ -131,7 +131,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
 
     register(obj: T, spawned: boolean): void {
         if (!obj) {
-            throw new GameFrameworkError("object is null");
+            throw new GameFrameworkError("object not exist");
         }
 
         let internalObject = FObject.create(obj, spawned);
@@ -260,7 +260,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
 
     private getObject(targetOrObject: object | T): FObject<T> | null {
         if (!targetOrObject) {
-            throw new GameFrameworkError("target or object is null");
+            throw new GameFrameworkError("target or object not exist");
         }
 
         let target: object | null = null;

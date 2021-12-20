@@ -51,7 +51,7 @@ export abstract class ObjectBase implements IRerference {
 
     initialize(name: string, target: object, locked: boolean = false, priority: number = 0): void {
         if (!target) {
-            throw new GameFrameworkError(`${name} target is null`);
+            throw new GameFrameworkError(`${name} target not exist`);
         }
         this._name = name || "";
         this._target = target;

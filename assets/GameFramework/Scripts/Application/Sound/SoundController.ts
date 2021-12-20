@@ -14,7 +14,7 @@ export class SoundController extends Component implements ISoundHelp {
 
     onLoad() {
         if (!this.audioSourceNode) {
-            throw new GameFrameworkError("audio source node is null");
+            throw new GameFrameworkError("audio source node not exist");
         }
     }
 
