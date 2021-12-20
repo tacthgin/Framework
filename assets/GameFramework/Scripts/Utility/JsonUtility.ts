@@ -47,7 +47,7 @@ export class JsonUtility {
      * @returns json对象
      */
     getJson(path: string, clone: boolean = false): object | null {
-        let jsonAsset = this._resourceManger.internalResourceLoader.getAsset(`${this._jsonDirPath}/${path}`, JsonAsset);
+        let jsonAsset = this._resourceManger.internalResourceLoader.getAsset(this._jsonDirPath ? `${this._jsonDirPath}/${path}` : path, JsonAsset);
         if (jsonAsset) {
             return clone ? this._systemUtility.clone(jsonAsset.json) || null : jsonAsset.json;
         } else {
