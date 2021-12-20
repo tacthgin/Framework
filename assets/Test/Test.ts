@@ -42,18 +42,24 @@ export class Test extends Component {
 
     start() {
         //GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
-        this.testC();
+        //this.testC();
+        this.testb();
     }
 
     onCallback(sender: object, e: any) {
         console.log("receive sender", sender, e);
     }
 
-    testb() {}
+    testb() {
+        GameApp.SoundManager.playBackgroundSound("Sound/background");
+        this.scheduleOnce(() => {
+            GameApp.SoundManager.playBackgroundSound("Sound/background_sky");
+        }, 10);
+    }
 
-    testa() {
-        ++this.a;
-        console.log("a", this, this.a);
+    async testa() {
+        let id = await GameApp.SoundManager.playSound("Sound/attack");
+        console.log(id, GameApp.SoundManager.getSoundGroup("Sound/attack")?.soundAgentCount);
     }
 
     async testC() {

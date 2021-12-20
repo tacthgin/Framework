@@ -4,6 +4,7 @@ import { ISoundHelp } from "./ISoundHelp";
 import { PlaySoundParams } from "./PlaySoundParams";
 
 export interface ISoundManager {
+    readonly backgroundSoundId: number;
     /**
      * 设置资源管理器
      * @param resourceManager 资源管理器
@@ -23,6 +24,13 @@ export interface ISoundManager {
      * @param playSoundParams 声音播放参数
      */
     playSound(soundAssetPath: string, soundGroupName?: string, playSoundParams?: PlaySoundParams): Promise<number>;
+
+    /**
+     * 播放背景声音
+     * @param soundAssetPath 声音资源路径
+     * @param playSoundParams 声音播放参数
+     */
+    playBackgroundSound(soundAssetPath: string, playSoundParams?: PlaySoundParams): Promise<number>;
 
     /**
      * 暂停声音播放

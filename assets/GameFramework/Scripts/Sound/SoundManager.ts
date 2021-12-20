@@ -76,6 +76,9 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         if (this._backgroundSoundId != 0) {
             this.stopSound(this._backgroundSoundId);
         }
+        if (!playSoundParams) {
+            playSoundParams = PlaySoundParams.create(true);
+        }
         this._backgroundSoundId = await this.playSound(soundAssetPath, this._backgroundGroupName, playSoundParams);
         return this._backgroundSoundId;
     }

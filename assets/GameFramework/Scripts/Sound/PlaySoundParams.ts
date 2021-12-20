@@ -7,16 +7,32 @@ export class PlaySoundParams implements IRerference {
     private _time: number = 0;
     private _muteInSoundGroup: boolean = false;
 
+    set volumeInSoundGroup(value: number) {
+        this._volumeInSoundGroup = value;
+    }
+
     get volumeInSoundGroup(): number {
         return this._volumeInSoundGroup;
+    }
+
+    set muteInSoundGroup(value: boolean) {
+        this._muteInSoundGroup = value;
     }
 
     get muteInSoundGroup(): boolean {
         return this._muteInSoundGroup;
     }
 
+    set loop(value: boolean) {
+        this._loop = value;
+    }
+
     get loop(): boolean {
         return this._loop;
+    }
+
+    set time(value: number) {
+        this._time = value;
     }
 
     get time(): number {

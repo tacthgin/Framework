@@ -14,7 +14,7 @@ export class CSoundAgentHelp implements ISoundAgentHelp {
     }
 
     get isPlaying(): boolean {
-        return this._audioSource.state != AudioSource.AudioState.STOPPED;
+        return this._audioSource.state == AudioSource.AudioState.PLAYING || this._audioSource.state == AudioSource.AudioState.PAUSED;
     }
 
     get length(): number {
