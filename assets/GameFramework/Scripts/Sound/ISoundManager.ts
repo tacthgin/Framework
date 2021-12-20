@@ -43,6 +43,11 @@ export interface ISoundManager {
     stopSound(soundId: number): void;
 
     /**
+     * 停止所有正在播放的
+     */
+    stopAllLoadedSounds(): void;
+
+    /**
      * 是否有声音组
      * @param soundGroupName 声音组名字
      */

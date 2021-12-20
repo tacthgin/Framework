@@ -16,6 +16,8 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private _resourceManager: IResourceManager | null = null;
     private _soundHelp: ISoundHelp | null = null;
     private _serialId: number = 0;
+    private _backgroundSoundId: number = 0;
+    private readonly _backgroundGroupName: string = "gameframework_background_sound_group";
 
     constructor() {
         super();
@@ -26,12 +28,15 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         return 7;
     }
 
-    update(elapseSeconds: number): void {
-        throw new Error("Method not implemented.");
+    get backgroundSoundId(): number {
+        return this._backgroundSoundId;
     }
 
+    update(elapseSeconds: number): void {}
+
     shutDown(): void {
-        throw new Error("Method not implemented.");
+        this.stopAllLoadedSounds();
+        this._soundGroups.clear();
     }
 
     setResourceManager(resourceManager: IResourceManager) {
@@ -67,6 +72,14 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         return this._serialId;
     }
 
+    async playBackgroundSound(soundAssetPath: string, playSoundParams?: PlaySoundParams): Promise<number> {
+        if (this._backgroundSoundId != 0) {
+            this.stopSound(this._backgroundSoundId);
+        }
+        this._backgroundSoundId = await this.playSound(soundAssetPath, this._backgroundGroupName, playSoundParams);
+        return this._backgroundSoundId;
+    }
+
     pauseSound(soundId: number): void {
         for (let soundGroupInfo of this._soundGroups) {
             if (soundGroupInfo[1].pauseSound(soundId)) {
@@ -88,6 +101,12 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
             if (soundGroupInfo[1].stopSound(soundId)) {
                 break;
             }
+        }
+    }
+
+    stopAllLoadedSounds(): void {
+        for (let soundGroupInfo of this._soundGroups) {
+            soundGroupInfo[1].stopAllLoadedSounds();
         }
     }
 
