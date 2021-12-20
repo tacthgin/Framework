@@ -2,10 +2,12 @@ import { AudioClip } from "cc";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
+import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISoundGroup } from "./ISoundGroup";
 import { ISoundHelp } from "./ISoundHelp";
 import { ISoundManager } from "./ISoundManager";
+import { PlaySoundParams } from "./PlaySoundParams";
 import { SoundGroup } from "./SoundGroup";
 
 @GameFrameworkEntry.registerModule("SoundManager")
@@ -40,7 +42,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         this._soundHelp = soundHelp;
     }
 
-    async playSound(soundAssetPath: string, soundGroupName: string = ""): Promise<number> {
+    async playSound(soundAssetPath: string, soundGroupName: string = "", playSoundParams?: PlaySoundParams): Promise<number> {
         if (!this._resourceManager) {
             throw new GameFrameworkError("resource mamager not exist");
         }
@@ -53,19 +55,43 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         if (!this.hasSoundGroup(soundGroupName)) {
             this.addSoundGroup(soundGroupName);
         }
+
+        if (!playSoundParams) {
+            playSoundParams = PlaySoundParams.create();
+        }
+
         ++this._serialId;
         let soundGroup: SoundGroup = this.getSoundGroup(soundGroupName) as SoundGroup;
-        soundGroup;
-        return 1;
+        soundGroup.playSound(this._serialId, audioClip, playSoundParams);
+        ReferencePool.release(playSoundParams);
+        return this._serialId;
     }
 
-    pauseSound(soundId: number) {}
+    pauseSound(soundId: number): void {
+        for (let soundGroupInfo of this._soundGroups) {
+            if (soundGroupInfo[1].pauseSound(soundId)) {
+                break;
+            }
+        }
+    }
 
-    resumeSound(soundId: number) {}
+    resumeSound(soundId: number): void {
+        for (let soundGroupInfo of this._soundGroups) {
+            if (soundGroupInfo[1].resumeSound(soundId)) {
+                break;
+            }
+        }
+    }
 
-    stopSound(soundId: number) {}
+    stopSound(soundId: number): void {
+        for (let soundGroupInfo of this._soundGroups) {
+            if (soundGroupInfo[1].stopSound(soundId)) {
+                break;
+            }
+        }
+    }
 
-    hasSoundGroup(soundGroupName: string) {
+    hasSoundGroup(soundGroupName: string): boolean {
         return this.getSoundGroup(soundGroupName) != null;
     }
 
@@ -85,6 +111,9 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
             return false;
         } else {
             soundGroup = new SoundGroup(soundGroupName);
+            if (this._soundHelp) {
+                soundGroup.addSoundHelp(this._soundHelp);
+            }
             this._soundGroups.set(soundGroupName, soundGroup);
             return true;
         }
