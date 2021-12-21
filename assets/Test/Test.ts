@@ -47,6 +47,9 @@ export class Test extends Component {
         this.testb();
         this.testD();
         this.testE();
+        let a = [1, 2, 3];
+        a.splice(2, 0, 4);
+        console.log(a);
     }
 
     onCallback(sender: object, e: any) {
@@ -56,8 +59,11 @@ export class Test extends Component {
     testb() {
         GameApp.SoundManager.playBackgroundSound("Sound/background");
         this.scheduleOnce(() => {
-            GameApp.SoundManager.playBackgroundSound("Sound/background_sky");
-        }, 10);
+            GameApp.SoundManager.pauseSound(GameApp.SoundManager.backgroundSoundId);
+        }, 20);
+        this.scheduleOnce(() => {
+            GameApp.SoundManager.resumeSound(GameApp.SoundManager.backgroundSoundId);
+        }, 30);
     }
 
     async testa() {
