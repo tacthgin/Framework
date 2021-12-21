@@ -3,6 +3,7 @@ import { GameFrameworkLinkedList, LinkedListNode } from "../Base/GameFrameworkLi
 import { GameFrameworkMap } from "../Base/GameFrameworkMap";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { FObject } from "./FObject";
+import { IObjectPool } from "./IObjectPool";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectInfo } from "./ObjectInfo";
 import { ObjectPoolBase } from "./ObjectPoolBase";
@@ -11,7 +12,7 @@ import { ReleaseObjectFilterCallback } from "./ReleaseObjectFilterCallback";
 /**
  * 对象池
  */
-export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
+export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements IObjectPool<T> {
     private readonly _objects: GameFrameworkMap<string, FObject<T>> = null!;
     private readonly _objectMap: Map<object, FObject<T>> = null!;
     private readonly _cachedCanReleaseObjects: Array<T> = null!;
@@ -292,7 +293,6 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase<T> {
             for (let i = candidateObjects.length - 1; i >= 0; --i) {
                 if (candidateObjects[i].lastUseTime <= expireTime) {
                     this._cachedNeedReleaseObjects.push(candidateObjects[i]);
-                    // ?数组直接删除不友好
                     candidateObjects.splice(i, 1);
                 }
             }

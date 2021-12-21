@@ -5,6 +5,7 @@ import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkMap } from "../Base/GameFrameworkMap";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { IObejctPoolManager } from "./IObejctPoolManager";
+import { IObjectPool } from "./IObjectPool";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectPool } from "./ObjectPool";
 import { ObjectPoolBase } from "./ObjectPoolBase";
@@ -15,14 +16,14 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     private readonly _defaultExpireTime: number = Number.MAX_VALUE;
     private readonly _defaultPriority: number = 0;
 
-    private readonly _objectPools: Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase<ObjectBase>> = null!;
-    private readonly _cachedAllObjectPools: Array<ObjectPoolBase<ObjectBase>> = null!;
+    private readonly _objectPools: Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase> = null!;
+    private readonly _cachedAllObjectPools: Array<ObjectPoolBase> = null!;
     private readonly _constructorToPairMap: GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>> = null!;
 
     constructor() {
         super();
-        this._objectPools = new Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase<ObjectBase>>();
-        this._cachedAllObjectPools = new Array<ObjectPoolBase<ObjectBase>>();
+        this._objectPools = new Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase>();
+        this._cachedAllObjectPools = new Array<ObjectPoolBase>();
         this._constructorToPairMap = new GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>>();
     }
 
@@ -35,13 +36,13 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     }
 
     update(elapseSeconds: number): void {
-        this._objectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+        this._objectPools.forEach((objectPool: ObjectPoolBase) => {
             objectPool.update(elapseSeconds);
         });
     }
 
     shutDown(): void {
-        this._objectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+        this._objectPools.forEach((objectPool: ObjectPoolBase) => {
             objectPool.shutDown();
         });
         this._objectPools.clear();
@@ -53,18 +54,26 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return this.internalGetObjectPoolPair(constructor, name) != null;
     }
 
-    getObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): ObjectPoolBase<T> | null {
+    getObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): IObjectPool<T> | null {
         let pair = this.internalGetObjectPoolPair(constructor, name);
         if (pair) {
-            return (this._objectPools.get(pair) as ObjectPoolBase<T>) || null;
+            return (this._objectPools.get(pair) as unknown as IObjectPool<T>) || null;
         }
         return null;
     }
 
-    getAllObjectPools(sort: boolean, results: ObjectPoolBase<ObjectBase>[]): void {
+    getObjectPoolBase(constructor: Constructor<ObjectBase>, name?: string): ObjectPoolBase | null {
+        let objectPool = this.getObjectPool(constructor, name);
+        if (objectPool) {
+            return objectPool as unknown as ObjectPoolBase;
+        }
+        return null;
+    }
+
+    getAllObjectPools(sort: boolean, results: ObjectPoolBase[]): void {
         results.length = 0;
 
-        this._objectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+        this._objectPools.forEach((objectPool: ObjectPoolBase) => {
             results.push(objectPool);
         });
 
@@ -80,8 +89,19 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         capacity: number = this._defaultCapacity,
         expireTime: number = this._defaultExpireTime,
         priority: number = this._defaultPriority
-    ): ObjectPoolBase<T> {
+    ): IObjectPool<T> {
         return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority);
+    }
+
+    createSingleSpawnObjectPoolBase(
+        constructor: Constructor<ObjectBase>,
+        name: string,
+        autoReleaseInterval: number = this._defaultExpireTime,
+        capacity: number = this._defaultCapacity,
+        expireTime: number = this._defaultExpireTime,
+        priority: number = this._defaultPriority
+    ): ObjectPoolBase {
+        return this.internalCreateObjectPool(constructor, name, false, autoReleaseInterval, capacity, expireTime, priority) as unknown as ObjectPoolBase;
     }
 
     CreateMultiSpawnObjectPool<T extends ObjectBase>(
@@ -91,8 +111,19 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         capacity: number = this._defaultCapacity,
         expireTime: number = this._defaultExpireTime,
         priority: number = this._defaultPriority
-    ): ObjectPoolBase<T> {
+    ): IObjectPool<T> {
         return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority);
+    }
+
+    CreateMultiSpawnObjectPoolBase(
+        constructor: Constructor<ObjectBase>,
+        name: string,
+        autoReleaseInterval: number = this._defaultExpireTime,
+        capacity: number = this._defaultCapacity,
+        expireTime: number = this._defaultExpireTime,
+        priority: number = this._defaultPriority
+    ): ObjectPoolBase {
+        return this.internalCreateObjectPool(constructor, name, true, autoReleaseInterval, capacity, expireTime, priority) as unknown as ObjectPoolBase;
     }
 
     destroyObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): boolean {
@@ -112,14 +143,14 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
 
     release(): void {
         this.getAllObjectPools(true, this._cachedAllObjectPools);
-        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase) => {
             objectPool.release();
         });
     }
 
     releaseAllUnused(): void {
         this.getAllObjectPools(true, this._cachedAllObjectPools);
-        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase<ObjectBase>) => {
+        this._cachedAllObjectPools.forEach((objectPool: ObjectPoolBase) => {
             objectPool.releaseAllUnused();
         });
     }
@@ -148,7 +179,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         capacity: number,
         expireTime: number,
         priority: number
-    ): ObjectPoolBase<T> {
+    ): IObjectPool<T> {
         if (!constructor) {
             throw new GameFrameworkError("constructor is invalid");
         }
@@ -164,7 +195,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return objectPool;
     }
 
-    private static ObjectPoolComparer(left: ObjectPoolBase<ObjectBase>, right: ObjectPoolBase<ObjectBase>): number {
+    private static ObjectPoolComparer(left: ObjectPoolBase, right: ObjectPoolBase): number {
         return right.priority - left.priority;
     }
 }
