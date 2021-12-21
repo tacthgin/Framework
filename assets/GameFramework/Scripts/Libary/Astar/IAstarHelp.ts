@@ -1,5 +1,8 @@
 import { IVec2 } from "./IVec2";
 
+/**
+ * A*辅助器接口
+ */
 export interface IAstarHelp {
     /**
      * 当前位置到结束位置的最短预估值
@@ -13,5 +16,5 @@ export interface IAstarHelp {
      * @param callbackfn 遍历节点的回调函数
      * @param thisArg
      */
-    forEachAroundNode(callbackfn: (position: IVec2) => void, thisArg?: any): void;
+    forEachAroundNodes(callbackfn: (position: IVec2) => void, thisArg?: any): void;
 }

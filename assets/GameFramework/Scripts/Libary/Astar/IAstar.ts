@@ -13,6 +13,14 @@ export interface IAstar {
 
     /**
      * 创建路径
+     * @param beginPosition 起始位置
+     * @param endPosition 终点位置
+     * @returns 路径列表
      */
     makePath(beginPosition: IVec2, endPosition: IVec2): Array<IVec2>;
+
+    /**
+     * 清除缓存的节点
+     */
+    clearCacheNodes(): void;
 }

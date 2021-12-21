@@ -18,5 +18,5 @@ export interface IAstarMap {
      * 检查该位置是否可以行走
      * @param position
      */
-    checkEmpty(position: IVec2): boolean;
+    check(position: IVec2): boolean;
 }

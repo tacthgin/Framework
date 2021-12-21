@@ -29,10 +29,20 @@ export class Astar implements IAstar {
         this._releasedAstarNodes = new Array<AstarNode>();
     }
 
-    setAstarHelp(astarHelp: IAstarHelp) {
+    /**
+     * 设置A*辅助器
+     * @param astarHelp
+     */
+    setAstarHelp(astarHelp: IAstarHelp): void {
         this._astarHelp = astarHelp;
     }
 
+    /**
+     * 创建路径
+     * @param beginPosition 起始位置
+     * @param endPosition 终点位置
+     * @returns 路径列表
+     */
     makePath(beginPosition: IVec2, endPosition: IVec2): Array<IVec2> {
         if (!this._astarHelp) {
             throw new Error("astar help not exist");
@@ -49,14 +59,12 @@ export class Astar implements IAstar {
 
         this.clear();
 
-        //起点
-        let node: AstarNode = this.acquireAstarNode(beginPosition.x, beginPosition.y, hValue);
-        this._openList.push(node);
         this.addToOpenList(beginPosition, hValue, null);
 
+        let node: AstarNode | null = null;
         let lastNode: AstarNode | null = null;
         while (this._openList.length > 0) {
-            node = this._openList.shift()!;
+            node = this.popOpenList();
             if (node.equals(endPosition)) {
                 lastNode = node;
                 break;
@@ -73,24 +81,62 @@ export class Astar implements IAstar {
         }
 
         path.reverse();
+        this.recyle();
 
         return path;
     }
 
-    clear() {
-        this._openList.length = 0;
-        this._closeList.clear();
+    /**
+     * 清除缓存的节点
+     */
+    clearCacheNodes(): void {
+        this._releasedAstarNodes.length = 0;
     }
 
-    /** 边界判断 */
+    /**
+     * 清除开放和关闭列表
+     */
+    private clear(): void {
+        this._openList.length = 0;
+        this._closeList.clear();
+        this._cachedOpenList.clear();
+    }
+
+    /**
+     * 回收节点
+     */
+    private recyle() {
+        this._cachedAstarNodes.forEach((node) => {
+            this._releasedAstarNodes.push(node);
+        });
+        this._cachedAstarNodes.length = 0;
+        this._openList.forEach((node) => {
+            this._releasedAstarNodes.push(node);
+        });
+    }
+
+    /**
+     * 位置是否在地图范围
+     * @param position
+     * @returns
+     */
     private inBoundary(position: IVec2) {
         return position.x >= 0 && position.x < this._astarMap.width && position.y >= 0 && position.y < this._astarMap.height;
     }
 
+    /**
+     * 位置转换为唯一索引
+     * @param position
+     * @returns
+     */
     private positionToIndex(position: IVec2): number {
         return position.y * this._astarMap.width + position.x;
     }
 
+    /**
+     * 添加位置到关闭列表
+     * @param position
+     */
     private addPositionToCloseList(position: IVec2) {
         let index = this.positionToIndex(position);
         if (this._closeList.has(index)) {
@@ -99,6 +145,11 @@ export class Astar implements IAstar {
         this._closeList.add(index);
     }
 
+    /**
+     * 位置是否在关闭列表
+     * @param position
+     * @returns
+     */
     private isPositionInCloseList(position: IVec2): boolean {
         return this._closeList.has(this.positionToIndex(position));
     }
@@ -117,18 +168,29 @@ export class Astar implements IAstar {
         this._cachedOpenList.add(this.positionToIndex(position));
     }
 
+    /**
+     * 从开放列表取出估值最小的节点
+     * @returns
+     */
     private popOpenList() {
-        let astarNode = this._openList.pop()!
-        
+        let astarNode = this._openList.pop()!;
+        let index = this.positionToIndex(astarNode.position);
+        this._cachedOpenList.delete(index);
+        this._cachedAstarNodes.push(astarNode);
+        return astarNode;
     }
 
+    /**
+     * 添加当前节点周围的节点
+     * @param currentNode
+     * @param endPosition
+     */
     private addAroundNodes(currentNode: AstarNode, endPosition: IVec2) {
         this.addPositionToCloseList(currentNode.position);
-        this._cachedAstarNodes.push(currentNode);
 
-        this._astarHelp!.forEachAroundNode((position: IVec2) => {
+        this._astarHelp!.forEachAroundNodes((position: IVec2) => {
             let newPos: IVec2 = { x: currentNode.position.x + position.x, y: currentNode.position.y + position.y };
-            if (this.inBoundary(newPos) && !this.isPositionInCloseList(newPos) && !this._cachedOpenList.has(this.positionToIndex(newPos)) && this._astarMap.checkEmpty(position)) {
+            if (this.inBoundary(newPos) && !this.isPositionInCloseList(newPos) && !this._cachedOpenList.has(this.positionToIndex(newPos)) && this._astarMap.check(position)) {
                 this.addToOpenList(newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
             } else {
                 this.addPositionToCloseList(newPos);
@@ -136,6 +198,14 @@ export class Astar implements IAstar {
         });
     }
 
+    /**
+     * 获取节点
+     * @param x
+     * @param y
+     * @param hValue
+     * @param parentNode
+     * @returns
+     */
     private acquireAstarNode(x: number, y: number, hValue: number, parentNode: AstarNode | null = null): AstarNode {
         if (this._releasedAstarNodes.length > 0) {
             let node = this._releasedAstarNodes.pop()!;
