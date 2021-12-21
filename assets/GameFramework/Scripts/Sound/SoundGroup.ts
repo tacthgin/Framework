@@ -1,5 +1,4 @@
 import { GameFrameworkError } from "../Base/GameFrameworkError";
-import { ISoundAgent } from "./ISoundAgent";
 import { ISoundGroup } from "./ISoundGroup";
 import { ISoundHelp } from "./ISoundHelp";
 import { PlaySoundParams } from "./PlaySoundParams";
