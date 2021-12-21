@@ -5,6 +5,10 @@ import { ISaveHelp } from "./ISaveHelp";
  * 使用web标准的localStorage作为存储辅助器
  */
 export class WebSaveHelp implements ISaveHelp {
+    get count(): number {
+        return localStorage.length;
+    }
+
     setNumber(name: string, value: number): void {
         localStorage.setItem(name, value.toString());
     }

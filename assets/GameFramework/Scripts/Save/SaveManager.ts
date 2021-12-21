@@ -8,6 +8,10 @@ import { ISaveManager } from "./ISaveManager";
 export class SaveManager extends GameFrameworkModule implements ISaveManager {
     private _saveHelp: ISaveHelp | null = null;
 
+    get count(): number {
+        return localStorage.length;
+    }
+
     update(elapseSeconds: number): void {}
 
     shutDown(): void {}

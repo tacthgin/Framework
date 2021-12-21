@@ -99,5 +99,6 @@ export class Test extends Component {
 
         GameApp.SaveManager.setNumber("hello2", 1);
         console.log(GameApp.SaveManager.getNumber("hello2"));
+        console.log(GameApp.SaveManager.count);
     }
 }

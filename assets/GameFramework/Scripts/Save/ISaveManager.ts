@@ -5,6 +5,10 @@ import { ISaveHelp } from "./ISaveHelp";
  */
 export interface ISaveManager {
     /**
+     * 存储数据个数
+     */
+    readonly count: number;
+    /**
      * 设置存储辅助器
      * @param saveHelp
      */

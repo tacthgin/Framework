@@ -124,4 +124,9 @@ export class GameApp extends Component {
         Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
     }
+
+    update(elapseSeconds: number) {
+        GameFrameworkEntry.update(elapseSeconds);
+        this._modelContainer.update(elapseSeconds);
+    }
 }
