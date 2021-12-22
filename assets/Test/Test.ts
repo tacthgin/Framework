@@ -13,12 +13,12 @@ import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool
 import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { EventManager } from "../GameFramework/Scripts/Event/EventManager";
 import { IEventManager } from "../GameFramework/Scripts/Event/IEventManager";
-import { AstarFactory } from "../GameFramework/Scripts/Libary/Astar/AstarFactory";
-import { IAstarMap } from "../GameFramework/Scripts/Libary/Astar/IAstarMap";
-import { IVec2 } from "../GameFramework/Scripts/Libary/Astar/IVec2";
 import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctPoolManager";
 import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
 import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
+import { AstarFactory } from "../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
+import { IAstarMap } from "../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
+import { IVec2 } from "../GameFramework/Scripts/ToolLibary/Astar/IVec2";
 import { Utility } from "../GameFramework/Scripts/Utility/Utility";
 import { Test2 } from "./Test2";
 const { ccclass, property } = _decorator;
@@ -155,7 +155,7 @@ export class Test extends Component {
         let map = new AstarMapTest();
         map.print();
 
-        let astar = AstarFactory.createCrossAstar(map);
+        let astar = AstarFactory.createEightDirectionAstar(map);
         let path = astar.makePath({ x: 0, y: 0 }, { x: 9, y: 9 });
         map.drawPath(path);
         console.log("********************");
