@@ -21,7 +21,7 @@ export class AstarNode {
     }
 
     /**
-     * 地块唯一索引
+     * 节点唯一索引
      */
     get index() {
         return this._index;
@@ -55,7 +55,7 @@ export class AstarNode {
 
     /**
      * 初始化节点属性
-     * @param index 地块唯一索引
+     * @param index 节点唯一索引
      * @param position 当前节点位置
      * @param hValue 预估值
      * @param parentNode 父结点
