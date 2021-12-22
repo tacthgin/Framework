@@ -16,7 +16,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     private _resourceManager: IResourceManager | null = null;
     private _soundHelp: ISoundHelp | null = null;
     private _serialId: number = 0;
-    private _backgroundSoundId: number = 0;
+    private _backgroundSerialId: number = 0;
     private readonly _backgroundGroupName: string = "gameframework_background_sound_group";
 
     constructor() {
@@ -28,8 +28,8 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         return 7;
     }
 
-    get backgroundSoundId(): number {
-        return this._backgroundSoundId;
+    get backgroundSerialId(): number {
+        return this._backgroundSerialId;
     }
 
     update(elapseSeconds: number): void {}
@@ -73,35 +73,35 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     }
 
     async playBackgroundSound(soundAssetPath: string, playSoundParams?: PlaySoundParams): Promise<number> {
-        if (this._backgroundSoundId != 0) {
-            this.stopSound(this._backgroundSoundId);
+        if (this._backgroundSerialId != 0) {
+            this.stopSound(this._backgroundSerialId);
         }
         if (!playSoundParams) {
             playSoundParams = PlaySoundParams.create(true);
         }
-        this._backgroundSoundId = await this.playSound(soundAssetPath, this._backgroundGroupName, playSoundParams);
-        return this._backgroundSoundId;
+        this._backgroundSerialId = await this.playSound(soundAssetPath, this._backgroundGroupName, playSoundParams);
+        return this._backgroundSerialId;
     }
 
-    pauseSound(soundId: number): void {
+    pauseSound(serialId: number): void {
         for (let soundGroupInfo of this._soundGroups) {
-            if (soundGroupInfo[1].pauseSound(soundId)) {
+            if (soundGroupInfo[1].pauseSound(serialId)) {
                 break;
             }
         }
     }
 
-    resumeSound(soundId: number): void {
+    resumeSound(serialId: number): void {
         for (let soundGroupInfo of this._soundGroups) {
-            if (soundGroupInfo[1].resumeSound(soundId)) {
+            if (soundGroupInfo[1].resumeSound(serialId)) {
                 break;
             }
         }
     }
 
-    stopSound(soundId: number): void {
+    stopSound(serialId: number): void {
         for (let soundGroupInfo of this._soundGroups) {
-            if (soundGroupInfo[1].stopSound(soundId)) {
+            if (soundGroupInfo[1].stopSound(serialId)) {
                 break;
             }
         }

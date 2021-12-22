@@ -53,12 +53,12 @@ export class SoundGroup implements ISoundGroup {
 
     /**
      * 播放声音
-     * @param soundId 声音id
+     * @param serialId 声音id
      * @param soundAsset 声音资源
      * @param playSoundParams 播放声音需要的参数
      * @returns 声音代理
      */
-    playSound(soundId: number, soundAsset: object, playSoundParams: PlaySoundParams): void {
+    playSound(serialId: number, soundAsset: object, playSoundParams: PlaySoundParams): void {
         let candidateAgent: SoundAgent | null = null;
         for (let soundAgent of this._soundAgents) {
             if (!soundAgent.isPlaying) {
@@ -78,7 +78,7 @@ export class SoundGroup implements ISoundGroup {
         }
 
         if (candidateAgent && candidateAgent.setSoundAsset(soundAsset)) {
-            candidateAgent.soundId = soundId;
+            candidateAgent.serialId = serialId;
             candidateAgent.volumeInSoundGroup = playSoundParams.volumeInSoundGroup;
             candidateAgent.muteInSoundGroup = playSoundParams.muteInSoundGroup;
             candidateAgent.loop = playSoundParams.loop;
@@ -91,11 +91,11 @@ export class SoundGroup implements ISoundGroup {
 
     /**
      * 暂停声音
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    pauseSound(soundId: number): boolean {
+    pauseSound(serialId: number): boolean {
         for (let soundAgent of this._soundAgents) {
-            if (soundAgent.soundId == soundId) {
+            if (soundAgent.serialId == serialId) {
                 soundAgent.pause();
                 return true;
             }
@@ -105,11 +105,11 @@ export class SoundGroup implements ISoundGroup {
 
     /**
      * 恢复声音播放
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    resumeSound(soundId: number): boolean {
+    resumeSound(serialId: number): boolean {
         for (let soundAgent of this._soundAgents) {
-            if (soundAgent.soundId == soundId) {
+            if (soundAgent.serialId == serialId) {
                 soundAgent.resume();
                 return true;
             }
@@ -119,11 +119,11 @@ export class SoundGroup implements ISoundGroup {
 
     /**
      * 停止声音
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    stopSound(soundId: number): boolean {
+    stopSound(serialId: number): boolean {
         for (let soundAgent of this._soundAgents) {
-            if (soundAgent.soundId == soundId) {
+            if (soundAgent.serialId == serialId) {
                 soundAgent.stop();
                 return true;
             }

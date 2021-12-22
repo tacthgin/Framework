@@ -4,7 +4,7 @@ import { ISoundHelp } from "./ISoundHelp";
 import { PlaySoundParams } from "./PlaySoundParams";
 
 export interface ISoundManager {
-    readonly backgroundSoundId: number;
+    readonly backgroundSerialId: number;
     /**
      * 设置资源管理器
      * @param resourceManager 资源管理器
@@ -34,21 +34,21 @@ export interface ISoundManager {
 
     /**
      * 暂停声音播放
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    pauseSound(soundId: number): void;
+    pauseSound(serialId: number): void;
 
     /**
      * 恢复声音播放
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    resumeSound(soundId: number): void;
+    resumeSound(serialId: number): void;
 
     /**
      * 停止声音播放
-     * @param soundId 声音id
+     * @param serialId 声音id
      */
-    stopSound(soundId: number): void;
+    stopSound(serialId: number): void;
 
     /**
      * 停止所有正在播放的

@@ -9,7 +9,7 @@ export interface ISoundAgent {
     /**
      * 声音id
      */
-    readonly soundId: number;
+    readonly serialId: number;
 
     /**
      * 是否正在播放

@@ -5,7 +5,7 @@ import { ISoundGroup } from "./ISoundGroup";
 export class SoundAgent implements ISoundAgent {
     private _soundGroup: ISoundGroup = null!;
     private _soundAgentHelp: ISoundAgentHelp = null!;
-    private _soundId: number = 0;
+    private _serialId: number = 0;
     private _soundAsset: object | null = null;
     private _muteInSoundGroup: boolean = false;
     private _volumeInSoundGroup: number = 1;
@@ -19,12 +19,12 @@ export class SoundAgent implements ISoundAgent {
         return this._soundGroup;
     }
 
-    get soundId(): number {
-        return this._soundId;
+    get serialId(): number {
+        return this._serialId;
     }
 
-    set soundId(value: number) {
-        this._soundId = value;
+    set serialId(value: number) {
+        this._serialId = value;
     }
 
     get isPlaying(): boolean {
