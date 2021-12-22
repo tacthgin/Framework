@@ -65,13 +65,16 @@ class AstarMapTest implements IAstarMap {
     }
 
     drawPath(path: IVec2[]) {
+        let copymap = Utility.System.clone(this.map) as Array<Array<number>>;
         path.forEach((position) => {
-            this.map[position.y][position.x] = 2;
+            copymap[position.y][position.x] = 2;
         });
+        this.print(copymap);
     }
 
-    print() {
-        this.map.forEach((value) => {
+    print(map?: Array<Array<number>>) {
+        map = map || this.map;
+        map.forEach((value) => {
             console.log(value);
         });
     }
@@ -157,8 +160,16 @@ export class Test extends Component {
 
         let astar = AstarFactory.createEightDirectionAstar(map);
         let path = astar.makePath({ x: 0, y: 0 }, { x: 9, y: 9 });
-        map.drawPath(path);
+        console.log(astar.astarNodeCount);
         console.log("********************");
-        map.print();
+        map.drawPath(path);
+        path = astar.makePath({ x: 0, y: 2 }, { x: 9, y: 9 });
+        console.log(astar.astarNodeCount);
+        console.log("********************");
+        map.drawPath(path);
+        astar = AstarFactory.createCrossAstar(map);
+        path = astar.makePath({ x: 0, y: 0 }, { x: 9, y: 9 });
+        console.log("********************");
+        map.drawPath(path);
     }
 }

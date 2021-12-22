@@ -30,6 +30,13 @@ export class Astar implements IAstar {
     }
 
     /**
+     * 缓存的节点个数
+     */
+    get astarNodeCount(): number {
+        return this._releasedAstarNodes.length;
+    }
+
+    /**
      * 设置A*辅助器
      * @param astarHelp
      */
@@ -59,7 +66,7 @@ export class Astar implements IAstar {
 
         this.clear();
 
-        this.addToOpenList(beginPosition, hValue, null);
+        this.addToOpenList(this.positionToIndex(beginPosition), beginPosition, hValue, null);
 
         let node: AstarNode | null = null;
         let lastNode: AstarNode | null = null;
@@ -113,6 +120,7 @@ export class Astar implements IAstar {
         this._openList.forEach((node) => {
             this._releasedAstarNodes.push(node);
         });
+        this._openList.length = 0;
     }
 
     /**
@@ -135,36 +143,32 @@ export class Astar implements IAstar {
 
     /**
      * 添加位置到关闭列表
-     * @param position
+     * @param index
      */
-    private addPositionToCloseList(position: IVec2) {
-        let index = this.positionToIndex(position);
+    private addIndexToCloseList(index: number) {
         if (!this._closeList.has(index)) {
             this._closeList.add(index);
         }
     }
 
     /**
-     * 位置是否在关闭列表
-     * @param position
-     * @returns
+     * 插入节点到开放列表，并按f值排序
+     * @param index 节点唯一索引
+     * @param position 节点位置
+     * @param hValue 节点预估值
+     * @param parentNode 父节点
      */
-    private isPositionInCloseList(position: IVec2): boolean {
-        return this._closeList.has(this.positionToIndex(position));
-    }
-
-    /** 插入进开放列表按f值排序 */
-    private addToOpenList(position: IVec2, hValue: number, parentNode: AstarNode | null = null) {
-        let node = this.acquireAstarNode(position.x, position.y, hValue, parentNode);
-        let index = 0;
+    private addToOpenList(index: number, position: IVec2, hValue: number, parentNode: AstarNode | null = null) {
+        let node = this.acquireAstarNode(index, position, hValue, parentNode);
+        let openListIndex = 0;
         for (let i = this._openList.length - 1; i >= 0; --i) {
             if (node.fValue < this._openList[i].fValue) {
-                index = i + 1;
+                openListIndex = i + 1;
                 break;
             }
         }
-        this._openList.splice(index, 0, node);
-        this._cachedOpenList.add(this.positionToIndex(position));
+        this._openList.splice(openListIndex, 0, node);
+        this._cachedOpenList.add(index);
     }
 
     /**
@@ -185,15 +189,21 @@ export class Astar implements IAstar {
      * @param endPosition
      */
     private addAroundNodes(currentNode: AstarNode, endPosition: IVec2) {
-        this.addPositionToCloseList(currentNode.position);
+        this.addIndexToCloseList(currentNode.index);
 
         this._astarHelp!.forEachAroundNodes((position: IVec2) => {
             let newPos: IVec2 = { x: currentNode.position.x + position.x, y: currentNode.position.y + position.y };
-            if (this.inBoundary(newPos) && !this.isPositionInCloseList(newPos)) {
-                if (!this._cachedOpenList.has(this.positionToIndex(newPos)) && this._astarMap.check(newPos)) {
-                    this.addToOpenList(newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
-                } else {
-                    this.addPositionToCloseList(newPos);
+            if (this.inBoundary(newPos)) {
+                //在地图范围内
+                let index = this.positionToIndex(newPos);
+                if (!this._closeList.has(index)) {
+                    //不在关闭列表
+                    if (!this._cachedOpenList.has(index) && this._astarMap.check(newPos)) {
+                        //不在开放列表，并且地图测试通过，就加入开放列表
+                        this.addToOpenList(index, newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
+                    } else {
+                        this.addIndexToCloseList(index);
+                    }
                 }
             }
         });
@@ -207,13 +217,13 @@ export class Astar implements IAstar {
      * @param parentNode
      * @returns
      */
-    private acquireAstarNode(x: number, y: number, hValue: number, parentNode: AstarNode | null = null): AstarNode {
+    private acquireAstarNode(index: number, position: IVec2, hValue: number, parentNode: AstarNode | null = null): AstarNode {
         if (this._releasedAstarNodes.length > 0) {
             let node = this._releasedAstarNodes.pop()!;
-            node.initialize(x, y, hValue, parentNode);
+            node.initialize(index, position, hValue, parentNode);
             return node;
         } else {
-            return new AstarNode(x, y, hValue, parentNode);
+            return new AstarNode(index, position, hValue, parentNode);
         }
     }
 }

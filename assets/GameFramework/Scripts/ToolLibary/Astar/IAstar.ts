@@ -6,6 +6,11 @@ import { IVec2 } from "./IVec2";
  */
 export interface IAstar {
     /**
+     * 缓存的节点个数
+     */
+    readonly astarNodeCount: number;
+
+    /**
      * 设置A*辅助器
      * @param astarHelp
      */

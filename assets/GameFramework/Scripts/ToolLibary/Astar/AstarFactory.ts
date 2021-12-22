@@ -4,6 +4,9 @@ import { EightDirectionAstarHelp } from "./AstarHelp/EightDirectionAstarHelp";
 import { IAstar } from "./IAstar";
 import { IAstarMap } from "./IAstarMap";
 
+/**
+ * A*工厂
+ */
 export class AstarFactory {
     /**
      * 走十字格子的astar
