@@ -2,7 +2,7 @@ import { IAstarHelp } from "../IAstarHelp";
 import { IVec2 } from "../IVec2";
 
 /**
- * 走十字格子的辅助器
+ * 走十字格子的A*辅助器
  */
 export class CrossAstarHelp implements IAstarHelp {
     static s_roundNodes: Array<IVec2> = new Array<IVec2>({ x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 });
