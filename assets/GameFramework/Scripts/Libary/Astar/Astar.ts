@@ -139,10 +139,9 @@ export class Astar implements IAstar {
      */
     private addPositionToCloseList(position: IVec2) {
         let index = this.positionToIndex(position);
-        if (this._closeList.has(index)) {
-            throw new Error(`coord x:${position.x} y:${position.y} has exist in close list`);
+        if (!this._closeList.has(index)) {
+            this._closeList.add(index);
         }
-        this._closeList.add(index);
     }
 
     /**
@@ -190,10 +189,12 @@ export class Astar implements IAstar {
 
         this._astarHelp!.forEachAroundNodes((position: IVec2) => {
             let newPos: IVec2 = { x: currentNode.position.x + position.x, y: currentNode.position.y + position.y };
-            if (this.inBoundary(newPos) && !this.isPositionInCloseList(newPos) && !this._cachedOpenList.has(this.positionToIndex(newPos)) && this._astarMap.check(position)) {
-                this.addToOpenList(newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
-            } else {
-                this.addPositionToCloseList(newPos);
+            if (this.inBoundary(newPos) && !this.isPositionInCloseList(newPos)) {
+                if (!this._cachedOpenList.has(this.positionToIndex(newPos)) && this._astarMap.check(newPos)) {
+                    this.addToOpenList(newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
+                } else {
+                    this.addPositionToCloseList(newPos);
+                }
             }
         });
     }

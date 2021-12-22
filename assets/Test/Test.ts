@@ -13,6 +13,9 @@ import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool
 import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
 import { EventManager } from "../GameFramework/Scripts/Event/EventManager";
 import { IEventManager } from "../GameFramework/Scripts/Event/IEventManager";
+import { AstarFactory } from "../GameFramework/Scripts/Libary/Astar/AstarFactory";
+import { IAstarMap } from "../GameFramework/Scripts/Libary/Astar/IAstarMap";
+import { IVec2 } from "../GameFramework/Scripts/Libary/Astar/IVec2";
 import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctPoolManager";
 import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
 import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
@@ -35,6 +38,45 @@ interface A {}
 
 class C<T> {}
 
+class AstarMapTest implements IAstarMap {
+    private map: Array<Array<number>> = new Array<Array<number>>(
+        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 1, 0, 0, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 1, 0, 1, 1, 1, 0],
+        [0, 1, 0, 0, 0, 0, 1, 0, 1, 0],
+        [0, 0, 1, 1, 1, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1, 0, 1, 1],
+        [0, 1, 1, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 1, 0, 0, 0, 1, 1, 1, 0],
+        [0, 1, 1, 0, 0, 0, 1, 0, 0, 0]
+    );
+
+    get width(): number {
+        return this.map[0].length;
+    }
+
+    get height(): number {
+        return this.map.length;
+    }
+
+    check(position: IVec2): boolean {
+        return this.map[position.y][position.x] == 0;
+    }
+
+    drawPath(path: IVec2[]) {
+        path.forEach((position) => {
+            this.map[position.y][position.x] = 2;
+        });
+    }
+
+    print() {
+        this.map.forEach((value) => {
+            console.log(value);
+        });
+    }
+}
+
 @ccclass("Test")
 export class Test extends Component {
     private a: number = 1;
@@ -44,26 +86,27 @@ export class Test extends Component {
     start() {
         //GameFrameworkEntry.getModule<IEventManager>("EventManager").subscribe(1, this.onCallback, this);
         //this.testC();
-        this.testb();
+        this.testSound();
         this.testD();
         this.testE();
         let a = [1, 2, 3];
         a.splice(2, 0, 4);
         console.log(a);
+        this.testAstar();
     }
 
     onCallback(sender: object, e: any) {
         console.log("receive sender", sender, e);
     }
 
-    testb() {
+    testSound() {
         GameApp.SoundManager.playBackgroundSound("Sound/background");
-        this.scheduleOnce(() => {
-            GameApp.SoundManager.pauseSound(GameApp.SoundManager.backgroundSoundId);
-        }, 20);
-        this.scheduleOnce(() => {
-            GameApp.SoundManager.resumeSound(GameApp.SoundManager.backgroundSoundId);
-        }, 30);
+        // this.scheduleOnce(() => {
+        //     GameApp.SoundManager.pauseSound(GameApp.SoundManager.backgroundSoundId);
+        // }, 20);
+        // this.scheduleOnce(() => {
+        //     GameApp.SoundManager.resumeSound(GameApp.SoundManager.backgroundSoundId);
+        // }, 30);
     }
 
     async testa() {
@@ -106,5 +149,16 @@ export class Test extends Component {
         GameApp.SaveManager.setNumber("hello2", 1);
         console.log(GameApp.SaveManager.getNumber("hello2"));
         console.log(GameApp.SaveManager.count);
+    }
+
+    testAstar() {
+        let map = new AstarMapTest();
+        map.print();
+
+        let astar = AstarFactory.createCrossAstar(map);
+        let path = astar.makePath({ x: 0, y: 0 }, { x: 9, y: 9 });
+        map.drawPath(path);
+        console.log("********************");
+        map.print();
     }
 }

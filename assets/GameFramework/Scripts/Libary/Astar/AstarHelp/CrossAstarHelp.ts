@@ -5,7 +5,7 @@ import { IVec2 } from "../IVec2";
  * 走十字格子的辅助器
  */
 export class CrossAstarHelp implements IAstarHelp {
-    static s_crossAroundNodes: Array<IVec2> = new Array<IVec2>({ x: 0, y: 1 }, { x: 1, y: 0 }, { x: 0, y: -1 }, { x: -1, y: 0 });
+    static s_crossAroundNodes: Array<IVec2> = new Array<IVec2>({ x: 0, y: -1 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 });
 
     estimate(currentPosition: IVec2, endPosition: IVec2): number {
         return Math.abs(endPosition.y - currentPosition.y) + Math.abs(endPosition.x - currentPosition.x);
