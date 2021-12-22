@@ -33,12 +33,12 @@ export interface IUIForm {
 
     /**
      * 初始化界面
-     * @param serialId
-     * @param uiFormAssetName
-     * @param uiGroup
-     * @param pauseCoveredUIForm
-     * @param isNewInstance
-     * @param userData
+     * @param serialId 界面序列编号
+     * @param uiFormAssetName 界面资源名称
+     * @param uiGroup 界面所属的界面组
+     * @param pauseCoveredUIForm 是否暂停被覆盖的界面。
+     * @param isNewInstance 是否是新实例
+     * @param userData 用户数据
      */
     onInit(serialId: number, uiFormAssetName: string, uiGroup: IUIGroup, pauseCoveredUIForm: boolean, isNewInstance: boolean, userData: object): void;
 
@@ -49,14 +49,14 @@ export interface IUIForm {
 
     /**
      * 界面打开
-     * @param userData
+     * @param userData 用户数据
      */
     onOpen(userData: object): void;
 
     /**
      * 界面关闭
-     * @param isShutDown
-     * @param userData
+     * @param isShutDown 是否是关闭界面管理器的时候触发
+     * @param userData 用户数据
      */
     onClose(isShutDown: boolean, userData: object): void;
 
@@ -82,20 +82,20 @@ export interface IUIForm {
 
     /**
      * 界面激活
-     * @param userData
+     * @param userData 用户数据
      */
     onRefocus(userData: object): void;
 
     /**
      * 界面轮询
-     * @param elapseSeconds
+     * @param elapseSeconds 逻辑流逝时间
      */
     onUpdate(elapseSeconds: number): void;
 
     /**
      * 界面深度改变
-     * @param uiGroupDepth
-     * @param depthInUIGroup
+     * @param uiGroupDepth 所属的界面组深度
+     * @param depthInUIGroup 在界面组中的深度
      */
     onDepthChanged(uiGroupDepth: number, depthInUIGroup: number): void;
 }
