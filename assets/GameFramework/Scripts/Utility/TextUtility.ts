@@ -1,7 +1,7 @@
 export class TextUtility {
     readonly EPSILON: number = 0.000001;
     /** 数字单位配置表 */
-    private unitConfig: any = { system: 1000, units: ["K", "M", "B"] };
+    private readonly unitConfig = { system: 1000, units: ["K", "M", "B"] };
 
     /**
      * 设置单位配置

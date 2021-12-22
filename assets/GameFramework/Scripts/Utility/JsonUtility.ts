@@ -9,7 +9,7 @@ import { SystemUtility } from "./SystemUtility";
 export class JsonUtility {
     private _resourceManger: IResourceManager = null!;
     private _jsonDirPath: string = "";
-    private _cacheJsonKeyMap: Map<string, Map<string, Map<number | string, object>>> = null!;
+    private readonly _cacheJsonKeyMap: Map<string, Map<string, Map<number | string, object>>> = null!;
     private _systemUtility: SystemUtility = null!;
 
     constructor() {

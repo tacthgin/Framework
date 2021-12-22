@@ -6,19 +6,19 @@ import { IVec2 } from "./IVec2";
 
 export class Astar implements IAstar {
     /** 关闭列表的节点不会在用到 */
-    private _closeList: Set<number> = null!;
+    private readonly _closeList: Set<number> = null!;
     /** 从开放列表取估值最小的路径来行走 */
-    private _openList: Array<AstarNode> = null!;
+    private readonly _openList: Array<AstarNode> = null!;
     /** 是否缓存在开放列表中 */
-    private _cachedOpenList: Set<number> = null!;
+    private readonly _cachedOpenList: Set<number> = null!;
     /** A*地图 */
     private _astarMap: IAstarMap = null!;
     /** A*辅助器 */
     private _astarHelp: IAstarHelp | null = null;
     /** 暂时缓存节点 */
-    private _cachedAstarNodes: Array<AstarNode> = null!;
+    private readonly _cachedAstarNodes: Array<AstarNode> = null!;
     /** 已经释放的节点 */
-    private _releasedAstarNodes: Array<AstarNode> = null!;
+    private readonly _releasedAstarNodes: Array<AstarNode> = null!;
 
     constructor(astarMap: IAstarMap) {
         this._astarMap = astarMap;

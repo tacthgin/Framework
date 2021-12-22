@@ -7,7 +7,7 @@ import { SoundAgent } from "./SoundAgent";
 export class SoundGroup implements ISoundGroup {
     private _soundHelp: ISoundHelp | null = null;
     private _name: string = "";
-    private _soundAgents: Array<SoundAgent> = null!;
+    private readonly _soundAgents: Array<SoundAgent> = null!;
     private _mute: boolean = false;
     private _volume: number = 1;
 

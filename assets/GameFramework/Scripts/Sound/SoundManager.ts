@@ -12,7 +12,7 @@ import { SoundGroup } from "./SoundGroup";
 
 @GameFrameworkEntry.registerModule("SoundManager")
 export class SoundManager extends GameFrameworkModule implements ISoundManager {
-    private _soundGroups: Map<string, SoundGroup> = null!;
+    private readonly _soundGroups: Map<string, SoundGroup> = null!;
     private _resourceManager: IResourceManager | null = null;
     private _soundHelp: ISoundHelp | null = null;
     private _serialId: number = 0;

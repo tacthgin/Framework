@@ -7,7 +7,7 @@ import { IEventManager } from "./IEventManager";
 
 @GameFrameworkEntry.registerModule("EventManager")
 export class EventManager extends GameFrameworkModule implements IEventManager {
-    private _eventPool: EventPool<GameEventArgs> = null!;
+    private readonly _eventPool: EventPool<GameEventArgs> = null!;
 
     constructor() {
         super();
