@@ -5,7 +5,9 @@ import { Random } from "./Random";
 import { SystemUtility } from "./SystemUtility";
 import { TextUtility } from "./TextUtility";
 
-/** 工具工厂类 */
+/**
+ * 工具工厂类
+ */
 export class Utility {
     /** 系统工具类 */
     static readonly System: SystemUtility = new SystemUtility();
