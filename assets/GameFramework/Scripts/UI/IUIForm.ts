@@ -1,5 +1,8 @@
 import { IUIGroup } from "./IUIGroup";
 
+/**
+ * 界面接口
+ */
 export interface IUIForm {
     /**
      * 获取界面序列编号

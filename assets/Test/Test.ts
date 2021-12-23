@@ -92,10 +92,8 @@ export class Test extends Component {
         this.testSound();
         this.testD();
         this.testE();
-        let a = [1, 2, 3];
-        a.splice(2, 0, 4);
-        console.log(a);
-        this.testAstar();
+        //this.testAstar();
+        Utility.Date.format(Date.now(), "hh:mm:ss");
     }
 
     onCallback(sender: object, e: any) {
@@ -103,7 +101,7 @@ export class Test extends Component {
     }
 
     testSound() {
-        GameApp.SoundManager.playBackgroundSound("Sound/background");
+        //GameApp.SoundManager.playBackgroundSound("Sound/background");
         // this.scheduleOnce(() => {
         //     GameApp.SoundManager.pauseSound(GameApp.SoundManager.backgroundSoundId);
         // }, 20);
