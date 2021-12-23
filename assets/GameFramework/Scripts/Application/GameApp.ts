@@ -108,7 +108,10 @@ export class GameApp extends Component {
         //设置log辅助
         GameFrameworkLog.setLogHelp(new WebLogHelp());
         let resourceManager = GameApp.ResourceManager;
-        GameApp.UIManager.setResourceManager(resourceManager);
+        //初始化ui模块
+        let uiManager = GameApp.UIManager;
+        uiManager.setResourceManager(resourceManager);
+        uiManager.setObjectPoolManager(GameApp.ObjectPoolManager);
         //初始化声音模块
         let soundManager = GameApp.SoundManager;
         soundManager.setResourceManager(resourceManager);

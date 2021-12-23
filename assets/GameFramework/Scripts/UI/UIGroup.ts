@@ -1,9 +1,11 @@
+import { GameFrameworkLinkedList } from "../Base/GameFrameworkLinkedList";
 import { IUIForm } from "./IUIForm";
 import { IUIGroup } from "./IUIGroup";
 import { IUIGroupHelp } from "./IUIGroupHelp";
+import { UIFormInfo } from "./UIFormInfo";
 
 export class UIGroup implements IUIGroup {
-    private readonly _uiForms: Map<string, UIFormInfo> = null!;
+    private readonly _uiForms: GameFrameworkLinkedList<UIFormInfo> = null!;
     private _name: string = null!;
     private _uiGroupHelp: IUIGroupHelp = null!;
     private _depth: number = 0;
@@ -49,12 +51,15 @@ export class UIGroup implements IUIGroup {
     hasUIForm(serialIdOrUIFormAssetName: string | number): boolean {
         throw new Error("Method not implemented.");
     }
-    getUIForm(serialIdOrUIFormAssetName: string | number): boolean {
+
+    getUIForm(serialIdOrUIFormAssetName: string | number): IUIForm | null {
         throw new Error("Method not implemented.");
     }
+
     getUIForms(uiFormAssetName: string): IUIForm[] {
         throw new Error("Method not implemented.");
     }
+
     getAllUIForms(): IUIForm[] {
         throw new Error("Method not implemented.");
     }
