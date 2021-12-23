@@ -55,6 +55,10 @@ export class Astar implements IAstar {
             throw new Error("astar help not exist");
         }
 
+        if (!this.inBoundary(beginPosition)) {
+            throw new Error("begin position out of boundary");
+        }
+
         if (!this.inBoundary(endPosition)) {
             throw new Error("end position out of boundary");
         }
@@ -70,8 +74,8 @@ export class Astar implements IAstar {
 
         let node: AstarNode | null = null;
         let lastNode: AstarNode | null = null;
-        while (this._openList.length > 0) {
-            node = this.popOpenList();
+
+        while ((node = this.popOpenList())) {
             if (node.equals(endPosition)) {
                 lastNode = node;
                 break;
@@ -112,7 +116,7 @@ export class Astar implements IAstar {
     /**
      * 回收节点
      */
-    private recyle() {
+    private recyle(): void {
         this._cachedAstarNodes.forEach((node) => {
             this._releasedAstarNodes.push(node);
         });
@@ -128,7 +132,7 @@ export class Astar implements IAstar {
      * @param position
      * @returns
      */
-    private inBoundary(position: IVec2) {
+    private inBoundary(position: IVec2): boolean {
         return position.x >= 0 && position.x < this._astarMap.width && position.y >= 0 && position.y < this._astarMap.height;
     }
 
@@ -145,9 +149,11 @@ export class Astar implements IAstar {
      * 添加位置到关闭列表
      * @param index
      */
-    private addIndexToCloseList(index: number) {
+    private addIndexToCloseList(index: number): void {
         if (!this._closeList.has(index)) {
             this._closeList.add(index);
+        } else {
+            throw new Error(`index ${index} has exist in close list`);
         }
     }
 
@@ -158,7 +164,7 @@ export class Astar implements IAstar {
      * @param hValue 节点预估值
      * @param parentNode 父节点
      */
-    private addToOpenList(index: number, position: IVec2, hValue: number, parentNode: AstarNode | null = null) {
+    private addToOpenList(index: number, position: IVec2, hValue: number, parentNode: AstarNode | null = null): void {
         let node = this.acquireAstarNode(index, position, hValue, parentNode);
         let openListIndex = 0;
         for (let i = this._openList.length - 1; i >= 0; --i) {
@@ -175,12 +181,15 @@ export class Astar implements IAstar {
      * 从开放列表取出估值最小的节点
      * @returns
      */
-    private popOpenList() {
-        let astarNode = this._openList.pop()!;
-        let index = this.positionToIndex(astarNode.position);
-        this._cachedOpenList.delete(index);
-        this._cachedAstarNodes.push(astarNode);
-        return astarNode;
+    private popOpenList(): AstarNode | null {
+        let astarNode = this._openList.pop();
+        if (astarNode) {
+            let index = this.positionToIndex(astarNode.position);
+            this._cachedOpenList.delete(index);
+            this._cachedAstarNodes.push(astarNode);
+            return astarNode;
+        }
+        return null;
     }
 
     /**
@@ -188,7 +197,7 @@ export class Astar implements IAstar {
      * @param currentNode
      * @param endPosition
      */
-    private addAroundNodes(currentNode: AstarNode, endPosition: IVec2) {
+    private addAroundNodes(currentNode: AstarNode, endPosition: IVec2): void {
         this.addIndexToCloseList(currentNode.index);
 
         this._astarHelp!.forEachAroundNodes((position: IVec2) => {
@@ -196,10 +205,10 @@ export class Astar implements IAstar {
             if (this.inBoundary(newPos)) {
                 //在地图范围内
                 let index = this.positionToIndex(newPos);
-                if (!this._closeList.has(index)) {
-                    //不在关闭列表
-                    if (!this._cachedOpenList.has(index) && this._astarMap.check(newPos)) {
-                        //不在开放列表，并且地图测试通过，就加入开放列表
+                if (!this._closeList.has(index) && !this._cachedOpenList.has(index)) {
+                    //不在关闭列表和开放列表中
+                    if (this._astarMap.check(newPos)) {
+                        //地图测试通过，就加入开放列表
                         this.addToOpenList(index, newPos, this._astarHelp!.estimate(newPos, endPosition), currentNode);
                     } else {
                         this.addIndexToCloseList(index);
