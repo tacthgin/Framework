@@ -90,8 +90,9 @@ export class Astar implements IAstar {
             path.push(lastNode.position);
             lastNode = lastNode.parent;
         }
-
+        //路径反转
         path.reverse();
+        //回收节点
         this.recyle();
 
         return path;
@@ -194,8 +195,8 @@ export class Astar implements IAstar {
 
     /**
      * 添加当前节点周围的节点
-     * @param currentNode
-     * @param endPosition
+     * @param currentNode 当前节点
+     * @param endPosition 终点位置
      */
     private addAroundNodes(currentNode: AstarNode, endPosition: IVec2): void {
         this.addIndexToCloseList(currentNode.index);
@@ -219,11 +220,11 @@ export class Astar implements IAstar {
     }
 
     /**
-     * 获取节点
-     * @param x
-     * @param y
-     * @param hValue
-     * @param parentNode
+     * 生成A*节点
+     * @param index 节点唯一索引
+     * @param position 节点位置
+     * @param hValue 节点的预估值
+     * @param parentNode 父节点
      * @returns
      */
     private acquireAstarNode(index: number, position: IVec2, hValue: number, parentNode: AstarNode | null = null): AstarNode {
