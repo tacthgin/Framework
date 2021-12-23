@@ -7,22 +7,23 @@ import { IUIGroup } from "./IUIGroup";
 export interface IUIFormHelp {
     /**
      * 实例化界面
-     * @param uiformAsset 需要实例化的界面资源
+     * @param uiFormAsset 需要实例化的界面资源
      */
-    instantiateUIForm(uiformAsset: object): void;
+    instantiateUIForm(uiFormAsset: object): void;
 
     /**
      * 创建界面
-     * @param uiformInstance 界面示例
+     * @param uiFormInstance 界面示例
      * @param uiGroup 界面所属的界面组
      * @param userData 用户数据
+     * @returns 界面
      */
-    createUIForm(uiformInstance: object, uiGroup: IUIGroup, userData: object): IUIForm;
+    createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData: object): IUIForm;
 
     /**
      * 释放界面
-     * @param uiformAsset 要释放的界面资源
-     * @param uiformInstance 要释放的界面实例
+     * @param uiFormAsset 要释放的界面资源
+     * @param uiFormInstance 要释放的界面实例
      */
-    releaseUIForm(uiformAsset: object, uiformInstance: object): void;
+    releaseUIForm(uiFormAsset: object, uiFormInstance: object): void;
 }

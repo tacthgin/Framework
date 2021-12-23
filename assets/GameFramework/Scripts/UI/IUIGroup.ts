@@ -38,23 +38,27 @@ export interface IUIGroup {
     /**
      * 界面组中是否存在界面
      * @param serialIdOrUIFormAssetName 界面序列编号或者界面资源名称
+     * @returns 是否存在界面
      */
     hasUIForm(serialIdOrUIFormAssetName: number | string): boolean;
 
     /**
      * 从界面组获取界面
      * @param serialIdOrUIFormAssetName 界面序列编号或者界面资源名称
+     * @returns  获取到的界面
      */
-    getUIForm(serialIdOrUIFormAssetName: number | string): boolean;
+    getUIForm(serialIdOrUIFormAssetName: number | string): IUIForm | null;
 
     /**
      * 从界面组获取界面
-     * @param uiformAssetName 界面资源名称
+     * @param uiFormAssetName 界面资源名称
+     * @returns 获取到的界面
      */
-    getUIForms(uiformAssetName: string): IUIForm[];
+    getUIForms(uiFormAssetName: string): IUIForm[];
 
     /**
      * 从界面组中获取所有界面
+     * @returns 获取到的界面
      */
     getAllUIForms(): IUIForm[];
 }
