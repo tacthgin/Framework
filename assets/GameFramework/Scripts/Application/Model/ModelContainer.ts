@@ -31,14 +31,14 @@ export class ModelContainer {
     }
 
     update(elapseSeconds: number) {
-        this._models.forEach((node: LinkedListNode<ModelBase>) => {
-            node.value.update(elapseSeconds);
+        this._models.forEach((modelBase: ModelBase) => {
+            modelBase.update(elapseSeconds);
         });
     }
 
     shutDown() {
-        this._models.forEach((node: LinkedListNode<ModelBase>) => {
-            node.value.shutDown();
+        this._models.forEach((modelBase: ModelBase) => {
+            modelBase.shutDown();
         });
     }
 
@@ -89,9 +89,9 @@ export class ModelContainer {
         let node: LinkedListNode<ModelBase> | null = null;
 
         if (this._models.size > 0) {
-            for (let listNode of this._models) {
-                if (model.priority >= listNode.value.priority) {
-                    node = listNode;
+            for (let current = this._models.first; current != null; current = current.next) {
+                if (model.priority >= current.value.priority) {
+                    node = current;
                     break;
                 }
             }

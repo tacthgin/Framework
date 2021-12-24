@@ -284,29 +284,29 @@ export class GameFrameworkLinkedList<T> {
      * @param callbackfn 遍历回调函数
      * @param thisArg 函数this指针
      */
-    forEach(callbackfn: (value: LinkedListNode<T>, index: number, linkedList: GameFrameworkLinkedList<T>) => void, thisArg?: any): void {
+    forEach(callbackfn: (value: T, index: number, linkedList: GameFrameworkLinkedList<T>) => void, thisArg?: any): void {
         let current = this._first;
         let listIndex = 0;
         while (current) {
-            callbackfn.call(thisArg, current, listIndex++, this);
+            callbackfn.call(thisArg, current.value, listIndex++, this);
             current = current.next;
         }
     }
 
-    [Symbol.iterator](): IterableIterator<LinkedListNode<T>> {
+    [Symbol.iterator](): IterableIterator<T> {
         let current = this._first;
         return {
             next() {
                 if (current) {
-                    let value = current;
+                    let value = current.value;
                     current = current.next;
-                    return { done: false, value: value } as unknown as IteratorYieldResult<LinkedListNode<T>>;
+                    return { done: false, value: value } as unknown as IteratorYieldResult<T>;
                 } else {
-                    return { done: true, value: undefined } as unknown as IteratorReturnResult<LinkedListNode<T>>;
+                    return { done: true, value: undefined } as unknown as IteratorReturnResult<T>;
                 }
             },
 
-            [Symbol.iterator](): IterableIterator<LinkedListNode<T>> {
+            [Symbol.iterator](): IterableIterator<T> {
                 return this;
             },
         };

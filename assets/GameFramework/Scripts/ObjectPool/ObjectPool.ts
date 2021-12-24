@@ -159,9 +159,9 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
 
         let objectList = this._objects.get(name);
         if (objectList) {
-            for (let node of objectList) {
-                if (this._allowMultiSpawn || !node.value.isInUse) {
-                    return node.value.spawn();
+            for (let fobject of objectList) {
+                if (this._allowMultiSpawn || !fobject.isInUse) {
+                    return fobject.spawn();
                 }
             }
         }
@@ -231,8 +231,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
     GetAllObjectInfos(): ObjectInfo[] {
         let results: ObjectInfo[] = [];
         this._objects.forEach((internalObjects: GameFrameworkLinkedList<FObject<T>>) => {
-            internalObjects.forEach((node: LinkedListNode<FObject<T>>) => {
-                let internalObject = node.value;
+            internalObjects.forEach((internalObject: FObject<T>) => {
                 results.push(
                     new ObjectInfo(internalObject.name, internalObject.locked, internalObject.customCanReleaseFlag, internalObject.priority, internalObject.lastUseTime, internalObject.spawnCount)
                 );

@@ -66,9 +66,9 @@ export class EventPool<T extends BaseEventArgs> {
     unsubscribeTarget(target: object): void {
         let eventHandleTargetList = this._targetHandles.get(target);
         if (eventHandleTargetList) {
-            eventHandleTargetList.forEach((node: LinkedListNode<EventHandleTarget<T>>) => {
-                this._eventHandles.delete(node.value.id, node.value);
-                this.releaseEventHandleTarget(node.value);
+            eventHandleTargetList.forEach((eventTarget: EventHandleTarget<T>) => {
+                this._eventHandles.delete(eventTarget.id, eventTarget);
+                this.releaseEventHandleTarget(eventTarget);
             });
             this._targetHandles.delete(target);
         }
@@ -107,8 +107,8 @@ export class EventPool<T extends BaseEventArgs> {
     private handleEvent(sender: object, e: T): void {
         let eventHandleTargetList = this._eventHandles.get(e.id);
         if (eventHandleTargetList) {
-            eventHandleTargetList.forEach((node: LinkedListNode<EventHandleTarget<T>>) => {
-                node.value.handle.call(node.value.target, sender, e);
+            eventHandleTargetList.forEach((eventTarget: EventHandleTarget<T>) => {
+                eventTarget.handle.call(eventTarget.target, sender, e);
             });
         } else {
             throw new GameFrameworkError(`event id:${e.id} has not event handle`);
