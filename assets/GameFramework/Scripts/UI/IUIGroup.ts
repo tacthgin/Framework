@@ -23,7 +23,7 @@ export interface IUIGroup {
     /**
      * 获取界面组中界面数量
      */
-    readonly uiformCount: number;
+    readonly uiFormCount: number;
 
     /**
      * 获取当前界面
