@@ -20,6 +20,8 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _instancePool: IObjectPool<UIFormInstanceObject> = null!;
     private _uiFormHelp: IUIFormHelp | null = null;
     private _serialId: number = 0;
+    private _shutDown: boolean = false;
+    private _recyleQueue: Array<IUIForm> = null!;
     static readonly defaultUIGroupName: string = "default_ui_group";
 
     constructor() {
@@ -200,7 +202,29 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     closeUIForm(serialIdOrUIForm: number | IUIForm, userData?: object): void {
-        throw new Error("Method not implemented.");
+        let uiForm: IUIForm | null = null;
+        if (typeof serialIdOrUIForm === "number") {
+            uiForm = this.getUIForm(serialIdOrUIForm);
+
+            if (!uiForm) {
+                throw new GameFrameworkError("ui form not exist");
+            }
+        } else {
+            uiForm = serialIdOrUIForm;
+        }
+
+        let uiGroup = uiForm.uiGroup as UIGroup;
+        if (!uiGroup) {
+            throw new GameFrameworkError("ui group not exist");
+        }
+
+        uiGroup.removeUIForm(uiForm);
+        uiForm.onClose(this._shutDown, userData);
+        uiGroup.refresh();
+        //事件发射
+        //
+
+        this._recyleQueue.push(uiForm);
     }
 
     closeAllLoadedUIForms(userData?: object): void {

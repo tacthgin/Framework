@@ -54,14 +54,14 @@ export interface IUIForm {
      * 界面打开
      * @param userData 用户数据
      */
-    onOpen(userData: object): void;
+    onOpen(userData?: object): void;
 
     /**
      * 界面关闭
      * @param isShutDown 是否是关闭界面管理器的时候触发
      * @param userData 用户数据
      */
-    onClose(isShutDown: boolean, userData: object): void;
+    onClose(isShutDown: boolean, userData?: object): void;
 
     /**
      * 界面暂停
@@ -87,7 +87,7 @@ export interface IUIForm {
      * 界面激活
      * @param userData 用户数据
      */
-    onRefocus(userData: object): void;
+    onRefocus(userData?: object): void;
 
     /**
      * 界面轮询

@@ -160,7 +160,7 @@ export class UIGroup implements IUIGroup {
         this._uiFormInfos.addFirst(uiFormInfo);
     }
 
-    private refresh(): void {
+    refresh(): void {
         let current = this._uiFormInfos.first;
         let pause = this._pause;
         let cover = false;
