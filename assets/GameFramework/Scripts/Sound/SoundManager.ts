@@ -114,7 +114,10 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
     }
 
     hasSoundGroup(soundGroupName: string): boolean {
-        return this.getSoundGroup(soundGroupName) != null;
+        if (!soundGroupName) {
+            throw new GameFrameworkError("soundGroupName is invalid");
+        }
+        return this._soundGroups.has(soundGroupName);
     }
 
     getSoundGroup(soundGroupName: string): ISoundGroup | null {
