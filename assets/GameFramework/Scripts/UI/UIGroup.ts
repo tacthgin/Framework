@@ -116,9 +116,10 @@ export class UIGroup implements IUIGroup {
     }
 
     getAllUIForms(): IUIForm[] {
-        let uiForms: IUIForm[] = [];
+        let uiForms: Array<IUIForm> = new Array<IUIForm>(this._uiFormInfos.size);
+        let index = 0;
         for (let uiFormInfo of this._uiFormInfos) {
-            uiForms.push(uiFormInfo.uiForm);
+            uiForms[index++] = uiFormInfo.uiForm;
         }
         return uiForms;
     }
@@ -160,7 +161,67 @@ export class UIGroup implements IUIGroup {
     }
 
     private refresh(): void {
-        
+        let current = this._uiFormInfos.first;
+        let pause = this._pause;
+        let cover = false;
+        let depth = this.uiFormCount;
+        while (current && current.value) {
+            let next = current.next;
+            current.value.uiForm.onDepthChanged(this.depth, depth--);
+            if (current.value === null) {
+                return;
+            }
+            if (pause) {
+                if (!current.value.covered) {
+                    current.value.covered = true;
+                    current.value.uiForm.onCover();
+                    if (current.value === null) {
+                        return;
+                    }
+                }
+
+                if (!current.value.paused) {
+                    current.value.paused = true;
+                    current.value.uiForm.onPause();
+                    if (current.value === null) {
+                        return;
+                    }
+                }
+            } else {
+                if (current.value.paused) {
+                    current.value.paused = false;
+                    current.value.uiForm.onResume();
+                    if (current.value === null) {
+                        return;
+                    }
+                }
+
+                if (current.value.uiForm.pauseCoveredUIForm) {
+                    pause = true;
+                }
+
+                if (cover) {
+                    if (!current.value.covered) {
+                        current.value.covered = true;
+                        current.value.uiForm.onCover();
+                        if (current.value === null) {
+                            return;
+                        }
+                    }
+                } else {
+                    if (current.value.covered) {
+                        current.value.covered = false;
+                        current.value.uiForm.onReveal();
+                        if (current.value === null) {
+                            return;
+                        }
+                    }
+
+                    cover = true;
+                }
+            }
+            current = next;
+        }
     }
 
     private getUIFormInfo(uiForm: IUIForm): UIFormInfo | null {

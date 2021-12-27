@@ -75,7 +75,7 @@ export interface IUIManager {
      * @param uiGroupHelp 界面组辅助器
      * @returns 是否成功添加
      */
-    addUIGroup(uiGroupName: string, uiGroupHelp: IUIGroupHelp): boolean;
+    addUIGroup(uiGroupName: string, uiGroupDepth: number, uiGroupHelp: IUIGroupHelp): boolean;
 
     /**
      * 界面组中是否存在界面
@@ -141,7 +141,7 @@ export interface IUIManager {
     /**
      * 关闭所有正在加载的界面
      */
-    closeAllLoadeingUIForms(): void;
+    closeAllLoadingUIForms(): void;
 
     /**
      * 激活界面
