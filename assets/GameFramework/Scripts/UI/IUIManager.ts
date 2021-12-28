@@ -1,9 +1,11 @@
+import { EventHandle } from "../Base/EventPool/EventHandle";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { IUIForm } from "./IUIForm";
 import { IUIFormHelp } from "./IUIFormHelp";
 import { IUIGroup } from "./IUIGroup";
 import { IUIGroupHelp } from "./IUIGroupHelp";
+import { UIEventArgs } from "./UIEventArgs";
 
 export interface IUIManager {
     /**
@@ -48,6 +50,20 @@ export interface IUIManager {
      * @param uiFormHelp 界面辅助器
      */
     setUIFormHelp(uiFormHelp: IUIFormHelp): void;
+
+    /**
+     * 订阅UI事件
+     * @param id 事件id
+     * @param eventHandle 事件句柄
+     * @param thisArg
+     */
+    subscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void;
+
+    /**
+     * 取消订阅者的所有订阅
+     * @param target 订阅者
+     */
+    unsubscribeTarget(target: object): void;
 
     /**
      * 是否存在界面组
