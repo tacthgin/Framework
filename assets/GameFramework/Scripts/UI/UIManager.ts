@@ -1,3 +1,5 @@
+import { EventHandle } from "../Base/EventPool/EventHandle";
+import { EventPool } from "../Base/EventPool/EventPool";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
@@ -9,12 +11,17 @@ import { IUIFormHelp } from "./IUIFormHelp";
 import { IUIGroup } from "./IUIGroup";
 import { IUIGroupHelp } from "./IUIGroupHelp";
 import { IUIManager } from "./IUIManager";
+import { UIEvent } from "./UIEvent";
+import { UIEventArgs } from "./UIEventArgs";
 import { UIFormInstanceObject } from "./UIFormInstanceObject";
 import { UIGroup } from "./UIGroup";
 
 @GameFrameworkEntry.registerModule("UIManager")
 export class UIManager extends GameFrameworkModule implements IUIManager {
     private readonly _uiGroups: Map<string, UIGroup> = null!;
+    private readonly _uiFormBeingLoaded: Map<number, string> = null!;
+    private readonly _uiFormToReleaseOnLoad: Set<number> = null!;
+    private readonly _eventPool: EventPool<UIEventArgs> = null!;
     private _resourceManger: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _instancePool: IObjectPool<UIFormInstanceObject> = null!;
@@ -27,7 +34,9 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     constructor() {
         super();
         this._uiGroups = new Map<string, UIGroup>();
-        this._serialId = 0;
+        this._uiFormBeingLoaded = new Map<number, string>();
+        this._uiFormToReleaseOnLoad = new Set<number>();
+        this._eventPool = new EventPool<UIEventArgs>();
     }
 
     get uiGroupCount(): number {
@@ -82,6 +91,8 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._shutDown = true;
         this.closeAllLoadedUIForms();
         this._uiGroups.clear();
+        this._uiFormBeingLoaded.clear();
+        this._uiFormToReleaseOnLoad.clear();
         this._recyleQueue.length = 0;
     }
 
@@ -96,6 +107,14 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
 
     setUIFormHelp(uiFormHelp: IUIFormHelp): void {
         this._uiFormHelp = uiFormHelp;
+    }
+
+    subscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void {
+        this._eventPool.subscribe(id, eventHandle, thisArg);
+    }
+
+    unsubscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle, thisArg);
     }
 
     hasUIGroup(uiGroupName: string): boolean {
@@ -176,11 +195,25 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     getAllLoadingUIFormSerialIds(): number[] {
-        throw new Error("Method not implemented.");
+        let serialIds: Array<number> = new Array<number>(this._uiFormBeingLoaded.size);
+        let index = 0;
+        for (let pair of this._uiFormBeingLoaded) {
+            serialIds[index++] = pair[0];
+        }
+        return serialIds;
     }
 
     isLoadingUIForm(serialIdOrUIFormAssetName: string | number): boolean {
-        throw new Error("Method not implemented.");
+        if (typeof serialIdOrUIFormAssetName === "number") {
+            return this._uiFormBeingLoaded.has(serialIdOrUIFormAssetName);
+        } else if (serialIdOrUIFormAssetName) {
+            for (let pair of this._uiFormBeingLoaded) {
+                if (pair[1] === serialIdOrUIFormAssetName) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     async openUIForm(uiFormAssetName: string, uiGroupName?: string, pauseCoveredUIForm: boolean = false, userData?: Object): Promise<number> {
@@ -213,9 +246,18 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn();
 
         if (!uiFromInstanceObject) {
-            let asset = await this._resourceManger.internalResourceLoader.loadAsset(uiFormAssetName);
+            let asset = this._resourceManger.internalResourceLoader.getAsset(uiFormAssetName);
             if (!asset) {
-                throw new GameFrameworkError(`${uiFormAssetName} asset is invalid`);
+                this._uiFormBeingLoaded.set(serialId, uiFormAssetName);
+                asset = await this._resourceManger.internalResourceLoader.loadAsset(uiFormAssetName);
+                if (!asset) {
+                    throw new GameFrameworkError(`${uiFormAssetName} asset is invalid`);
+                }
+                this._uiFormBeingLoaded.delete(serialId);
+                if (this._uiFormToReleaseOnLoad.has(serialId)) {
+                    this._uiFormToReleaseOnLoad.delete(serialId);
+                    return -1;
+                }
             }
             uiFromInstanceObject = UIFormInstanceObject.create(uiFormAssetName, asset, this._uiFormHelp.instantiateUIForm(asset), this._uiFormHelp);
             this._instancePool.register(uiFromInstanceObject, true);
@@ -244,9 +286,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         uiGroup.removeUIForm(uiForm);
         uiForm.onClose(this._shutDown, userData);
         uiGroup.refresh();
-        //事件发射
-        //
-
+        this._eventPool.fireNow(this, UIEventArgs.create(UIEvent.UI_FORM_CLOSE_EVENT));
         this._recyleQueue.splice(0, 0, uiForm);
     }
 
@@ -260,7 +300,10 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     closeAllLoadingUIForms(): void {
-        throw new Error("Method not implemented.");
+        for (let pair of this._uiFormBeingLoaded) {
+            this._uiFormToReleaseOnLoad.add(pair[0]);
+        }
+        this._uiFormBeingLoaded.clear();
     }
 
     refocusUIForm(uiForm: IUIForm, userData?: object): void {
@@ -288,5 +331,6 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         uiGroup.addUIForm(uiForm);
         uiForm.onOpen(userData);
         uiGroup.refresh();
+        this._eventPool.fireNow(this, UIEventArgs.create(UIEvent.UI_FORM_OPEN_EVENT));
     }
 }
