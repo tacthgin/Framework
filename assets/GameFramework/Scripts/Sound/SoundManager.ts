@@ -1,4 +1,3 @@
-import { AudioClip } from "cc";
 import { GameFrameworkEntry } from "../Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
@@ -51,7 +50,7 @@ export class SoundManager extends GameFrameworkModule implements ISoundManager {
         if (!this._resourceManager) {
             throw new GameFrameworkError("resource mamager not exist");
         }
-        let audioClip = await this._resourceManager.internalResourceLoader.loadAsset(soundAssetPath, AudioClip);
+        let audioClip = await this._resourceManager.internalResourceLoader.loadAsset(soundAssetPath);
         if (!audioClip) {
             throw new GameFrameworkError(`audio clip ${soundAssetPath} not exist`);
         }
