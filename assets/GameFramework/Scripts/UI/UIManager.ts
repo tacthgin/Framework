@@ -113,6 +113,10 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._eventPool.subscribe(id, eventHandle, thisArg);
     }
 
+    unsubscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void {
+        this._eventPool.unsubscribe(id, eventHandle, thisArg);
+    }
+
     unsubscribeTarget(target: object): void {
         this._eventPool.unsubscribeTarget(target);
     }

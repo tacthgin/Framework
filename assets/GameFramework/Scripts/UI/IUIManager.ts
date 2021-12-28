@@ -60,6 +60,14 @@ export interface IUIManager {
     subscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void;
 
     /**
+     * 取消订阅UI事件
+     * @param id 事件id
+     * @param eventHandle 事件句柄
+     * @param thisArg
+     */
+    unsubscribe(id: number, eventHandle: EventHandle<UIEventArgs>, thisArg?: any): void;
+
+    /**
      * 取消订阅者的所有订阅
      * @param target 订阅者
      */
