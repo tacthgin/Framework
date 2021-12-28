@@ -60,6 +60,17 @@ export class UIGroup implements IUIGroup {
         return this._uiGroupHelp;
     }
 
+    update(elapseSeconds: number): void {
+        let current = this._uiFormInfos.first;
+        while (current) {
+            if (current.value.paused) {
+                break;
+            }
+            current.value.uiForm.onUpdate(elapseSeconds);
+            current = current.next;
+        }
+    }
+
     hasUIForm(serialIdOrUIFormAssetName: string | number): boolean {
         if (typeof serialIdOrUIFormAssetName === "number") {
             for (let uiFormInfo of this._uiFormInfos) {

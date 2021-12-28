@@ -66,10 +66,23 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         return this._instancePool.priority;
     }
 
-    update(elapseSeconds: number): void {}
+    update(elapseSeconds: number): void {
+        while (this._recyleQueue.length > 0) {
+            let uiForm = this._recyleQueue.pop()!;
+            uiForm.onRecyle();
+            this._instancePool.upspawn(uiForm.handle as UIFormInstanceObject);
+        }
+
+        for (let pair of this._uiGroups) {
+            pair[1].update(elapseSeconds);
+        }
+    }
 
     shutDown(): void {
+        this._shutDown = true;
+        this.closeAllLoadedUIForms();
         this._uiGroups.clear();
+        this._recyleQueue.length = 0;
     }
 
     setObjectPoolManager(objectPoolManager: IObejctPoolManager): void {
@@ -170,13 +183,17 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         throw new Error("Method not implemented.");
     }
 
-    openUIForm(uiFormAssetName: string, uiGroupName?: string, pauseCoveredUIForm: boolean = false, userData: object | null = null): number {
+    async openUIForm(uiFormAssetName: string, uiGroupName?: string, pauseCoveredUIForm: boolean = false, userData?: Object): Promise<number> {
         if (!this._resourceManger) {
-            throw new GameFrameworkError("resouce manager not exist");
+            throw new GameFrameworkError("you must set resouce manager first");
         }
 
         if (!this._objectPoolManager) {
-            throw new GameFrameworkError("object pool manager not exist");
+            throw new GameFrameworkError("you must set object pool manager first");
+        }
+
+        if (!this._uiFormHelp) {
+            throw new GameFrameworkError("you must set ui form help first");
         }
 
         if (!uiFormAssetName) {
@@ -193,11 +210,17 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         }
 
         let serialId = ++this._serialId;
-        let uiFromInstanceObject = this._instancePool.spawn();
-        if (uiFromInstanceObject) {
-            this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject, pauseCoveredUIForm, false, 0, userData);
-        } else {
+        let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn();
+
+        if (!uiFromInstanceObject) {
+            let asset = await this._resourceManger.internalResourceLoader.loadAsset(uiFormAssetName);
+            if (!asset) {
+                throw new GameFrameworkError(`${uiFormAssetName} asset is invalid`);
+            }
+            uiFromInstanceObject = UIFormInstanceObject.create(uiFormAssetName, asset, this._uiFormHelp.instantiateUIForm(asset), this._uiFormHelp);
+            this._instancePool.register(uiFromInstanceObject, true);
         }
+        this.internalOpenUIForm(serialId, uiFormAssetName, uiGroup as UIGroup, uiFromInstanceObject, pauseCoveredUIForm, false, userData);
         return serialId;
     }
 
@@ -224,11 +247,16 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         //事件发射
         //
 
-        this._recyleQueue.push(uiForm);
+        this._recyleQueue.splice(0, 0, uiForm);
     }
 
     closeAllLoadedUIForms(userData?: object): void {
-        throw new Error("Method not implemented.");
+        let uiForms = this.getAllLoadedUIForms();
+        uiForms.forEach((uiform) => {
+            if (this.hasUIForm(uiform.serialId)) {
+                this.closeUIForm(uiform);
+            }
+        });
     }
 
     closeAllLoadingUIForms(): void {
@@ -236,7 +264,14 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     refocusUIForm(uiForm: IUIForm, userData?: object): void {
-        throw new Error("Method not implemented.");
+        let uiGroup = uiForm.uiGroup as UIGroup;
+        if (!uiGroup) {
+            throw new GameFrameworkError("ui group not exist");
+        }
+
+        uiGroup.refocusUIForm(uiForm);
+        uiGroup.refresh();
+        uiForm.onRefocus(userData);
     }
 
     setUIFormInstanceLocked(uiFormInstance: object, locked: boolean): void {
@@ -247,14 +282,11 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._instancePool.setPriority(uiFormInstance, priority);
     }
 
-    private internalOpenUIForm(
-        serialId: number,
-        uiFormAssetName: string,
-        uiGroup: UIGroup,
-        uiFormInstance: object,
-        pauseCoveredUIForm: boolean,
-        isNewInstance: boolean,
-        duration: number,
-        userData: object | null
-    ) {}
+    private internalOpenUIForm(serialId: number, uiFormAssetName: string, uiGroup: UIGroup, uiFormInstance: object, pauseCoveredUIForm: boolean, isNewInstance: boolean, userData?: Object) {
+        let uiForm = this._uiFormHelp!.createUIForm(uiFormInstance, uiGroup, userData);
+        uiForm.onInit(serialId, uiFormAssetName, uiGroup, pauseCoveredUIForm, isNewInstance, userData);
+        uiGroup.addUIForm(uiForm);
+        uiForm.onOpen(userData);
+        uiGroup.refresh();
+    }
 }

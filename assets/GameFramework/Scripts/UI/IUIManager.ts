@@ -123,7 +123,7 @@ export interface IUIManager {
      * @param uiGroupName 界面所属的界面组名称
      * @returns 界面序列编号
      */
-    openUIForm(uiFormAssetName: string, uiGroupName: string): number;
+    openUIForm(uiFormAssetName: string, uiGroupName: string): Promise<number>;
 
     /**
      * 关闭界面

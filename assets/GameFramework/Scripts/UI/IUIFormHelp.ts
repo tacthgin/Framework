@@ -9,7 +9,7 @@ export interface IUIFormHelp {
      * 实例化界面
      * @param uiFormAsset 需要实例化的界面资源
      */
-    instantiateUIForm(uiFormAsset: object): void;
+    instantiateUIForm(uiFormAsset: object): object;
 
     /**
      * 创建界面
@@ -18,7 +18,7 @@ export interface IUIFormHelp {
      * @param userData 用户数据
      * @returns 界面
      */
-    createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData: object): IUIForm;
+    createUIForm(uiFormInstance: object, uiGroup: IUIGroup, userData?: Object): IUIForm;
 
     /**
      * 释放界面
