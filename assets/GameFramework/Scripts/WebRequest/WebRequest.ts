@@ -1,5 +1,4 @@
 // import { HttpClient } from "../Lib/HttpClient";
-// import { GameManager } from "./GameManager";
 
 // export class NetManager {
 //     private httpClient: HttpClient = null!;
