@@ -17,6 +17,7 @@ export interface ISaveHelp {
      * 获取数字类型的存储
      * @param name 存储名
      * @param defaultValue 存储默认值
+     * @returns 数字类型的存储或者数字默认值
      */
     getNumber(name: string, defaultValue?: number): number | null;
 
@@ -31,6 +32,7 @@ export interface ISaveHelp {
      * 获取字符串类型的存储
      * @param name 存储名
      * @param defaultValue 存储默认值
+     * @returns 字符串类型的存储或者字符串默认值
      */
     getString(name: string, defaultValue?: string): string | null;
 
@@ -45,6 +47,7 @@ export interface ISaveHelp {
      * 获取对象类型的存储
      * @param name 存储名
      * @param defaultValue 存储默认值
+     * @returns 对象类型的存储或者对象默认值
      */
     getObject(name: string, defaultValue?: object): object | null;
 
