@@ -20,7 +20,9 @@ export abstract class ModelBase implements IModel {
         this._eventPool.update(elapseSeconds);
     }
 
-    shutDown() {}
+    shutDown() {
+        this._eventPool.shutDown();
+    }
 
     setSaveManager(saveManager: ISaveManager): void {
         this._saveManager = saveManager;
@@ -43,4 +45,6 @@ export abstract class ModelBase implements IModel {
     }
 
     save(): void {}
+
+    load(localData: string): void {}
 }

@@ -32,19 +32,30 @@ export class ModelContainer {
         };
     }
 
+    /**
+     * 轮询模型
+     * @param elapseSeconds 逻辑流逝时间
+     */
     update(elapseSeconds: number) {
         this._models.forEach((modelBase: ModelBase) => {
             modelBase.update(elapseSeconds);
         });
     }
 
+    /**
+     * 关闭模型模块
+     */
     shutDown() {
         this._models.forEach((modelBase: ModelBase) => {
             modelBase.shutDown();
         });
     }
 
-    setSaveManager(saveManager: ISaveManager) {
+    /**
+     * 设置存储管理器
+     * @param saveManager 存储管理器
+     */
+    setSaveManager(saveManager: ISaveManager): void {
         this._saveManager = saveManager;
     }
 
@@ -83,6 +94,39 @@ export class ModelContainer {
         } else {
             throw new GameFrameworkError(`${className} model has not register`);
         }
+    }
+
+    /**
+     * 加载本地模型数据
+     */
+    loadLocalModel(): void {
+        if (!this._saveManager) {
+            throw new GameFrameworkError("you must set save manager first");
+        }
+        let modelInfos: Array<{
+            model: ModelBase;
+            value: string;
+        }> = [];
+
+        this._saveManager.forEach((name: string, value: string) => {
+            let ctor = ModelContainer.s_modelConstructors.get(name);
+            if (ctor) {
+                let model = this.getModel(ctor);
+                modelInfos.push({
+                    model: model,
+                    value: value,
+                });
+            }
+        });
+
+        //模块根据优先级排序
+        modelInfos.sort((l, r) => {
+            return r.model.priority - l.model.priority;
+        });
+
+        modelInfos.forEach((value) => {
+            value.model.load(value.value)
+        })
     }
 
     /**
