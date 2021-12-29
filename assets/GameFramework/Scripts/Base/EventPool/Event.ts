@@ -15,7 +15,7 @@ export class Event<T extends BaseEventArgs> implements IRerference {
     }
 
     static create<T extends BaseEventArgs>(sender: object, eventArgs: T): Event<T> {
-        let eventNode: Event<T> = ReferencePool.acquire(Event);
+        let eventNode: Event<T> = ReferencePool.acquire<Event<T>>(Event);
         eventNode._sender = sender;
         eventNode._eventArgs = eventArgs;
         return eventNode;

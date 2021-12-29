@@ -242,7 +242,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
 
     update(elapseSeconds: number): void {
         this._autoReleaseTime += elapseSeconds;
-        if (this._autoReleaseInterval >= this._autoReleaseInterval) {
+        if (this._autoReleaseTime >= this._autoReleaseInterval) {
             this.release();
         }
     }

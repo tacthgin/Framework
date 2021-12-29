@@ -37,6 +37,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiFormBeingLoaded = new Map<number, string>();
         this._uiFormToReleaseOnLoad = new Set<number>();
         this._eventPool = new EventPool<UIEventArgs>();
+        this._recyleQueue = new Array<IUIForm>();
     }
 
     get uiGroupCount(): number {

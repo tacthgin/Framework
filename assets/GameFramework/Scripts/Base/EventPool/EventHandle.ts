@@ -21,7 +21,7 @@ export class EventHandleTarget<T> implements IRerference {
     }
 
     static create<T>(id: number, target: object, handle: EventHandle<T>): EventHandleTarget<T> {
-        let eventHandleTarget: EventHandleTarget<T> = ReferencePool.acquire(EventHandleTarget);
+        let eventHandleTarget: EventHandleTarget<T> = ReferencePool.acquire<EventHandleTarget<T>>(EventHandleTarget);
         eventHandleTarget._id = id;
         eventHandleTarget._target = target;
         eventHandleTarget._handle = handle;

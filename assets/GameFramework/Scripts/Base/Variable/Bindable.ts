@@ -1,24 +1,30 @@
+import { ReferencePool } from "../ReferencePool/ReferencePool";
+import { Variable } from "./Variable";
+
 export type BindableEventHandle<T> = (value: T) => void;
 
-export class Bindable<T> {
-    private _value: T | null = null;
+export class Bindable<T> extends Variable<T> {
     private _eventPool: Map<BindableEventHandle<T>, any> = null!;
 
-    constructor(defeult: T) {
-        this._value = defeult;
+    constructor() {
+        super();
         this._eventPool = new Map<BindableEventHandle<T>, any>();
     }
 
     set value(value: T) {
-        if (this._value === value) {
+        if (this.value === value) {
             return;
         }
-        this._value = value;
+        this.value = value;
         this.fireNow();
     }
 
-    get value(): T {
-        return this._value!;
+    static create<T>(defeultValue: T | null = null): Bindable<T> {
+        let bindable = ReferencePool.acquire<Bindable<T>>(Bindable);
+        if (defeultValue !== null) {
+            bindable.value = defeultValue;
+        }
+        return bindable;
     }
 
     check(eventHandle: BindableEventHandle<T>, thisArg?: any) {

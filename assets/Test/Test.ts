@@ -30,7 +30,9 @@ class B extends ObjectBase {
     clear(): void {}
 }
 
-class HelloWorldClass implements IRerference {
+class HelloWorldClass<T> implements IRerference {
+    public value: T | null = null;
+
     clear(): void {}
 }
 
@@ -94,6 +96,15 @@ export class Test extends Component {
         this.testE();
         //this.testAstar();
         Utility.Date.format(Date.now(), "hh:mm:ss");
+        let h1 = ReferencePool.acquire<HelloWorldClass<number>>(HelloWorldClass);
+        h1.value = 111;
+        ReferencePool.release(h1);
+        let h4 = ReferencePool.acquire<HelloWorldClass<number>>(HelloWorldClass);
+        console.log(h4.value);
+        let h2 = ReferencePool.acquire<HelloWorldClass<string>>(HelloWorldClass);
+        h2.value = "333";
+        let h3 = ReferencePool.acquire(HelloWorldClass);
+        console.log(ReferencePool.getAllReferencePoolInfos());
     }
 
     onCallback(sender: object, e: any) {

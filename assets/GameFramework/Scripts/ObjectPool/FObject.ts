@@ -48,7 +48,7 @@ export class FObject<T extends ObjectBase> implements IRerference {
             throw new GameFrameworkError("object is invalid");
         }
 
-        let internalObject: FObject<T> = ReferencePool.acquire(FObject);
+        let internalObject: FObject<T> = ReferencePool.acquire<FObject<T>>(FObject);
         internalObject._object = obj;
         internalObject._spawnCount = spawned ? 1 : 0;
         if (spawned) {
