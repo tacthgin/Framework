@@ -28,7 +28,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
     }
 
     get priority(): number {
-        return 8;
+        return 3;
     }
 
     get count(): number {

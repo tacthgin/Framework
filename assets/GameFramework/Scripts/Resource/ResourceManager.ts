@@ -24,10 +24,6 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this.createResourceLoader("resources", resources);
     }
 
-    get priority(): number {
-        return 7;
-    }
-
     get internalResourceLoader(): IResourceLoader {
         return this.getResourceLoader("resources")!;
     }
@@ -36,6 +32,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
 
     shutDown(): void {
         this._resourceLoaders.clear();
+        this._remoteAssets.clear();
     }
 
     loadBundle(bundleNameOrUrl: string, options?: OptionBundle): Promise<IResourceLoader | null> {

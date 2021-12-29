@@ -15,7 +15,7 @@ export class EventManager extends GameFrameworkModule implements IEventManager {
     }
 
     get priority(): number {
-        return 6;
+        return 4;
     }
 
     update(elapseSeconds: number): void {
