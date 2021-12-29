@@ -101,7 +101,7 @@ export class GameApp extends Component {
         //初始化框架
         this.initalizeFramework();
         //初始化model
-        this._modelContainer = new ModelContainer();
+        this.initializeModel();
     }
 
     private initalizeFramework() {
@@ -126,6 +126,10 @@ export class GameApp extends Component {
         //初始化JSON工具类
         Utility.Json.setResourceManager(resourceManager);
         Utility.Json.setSystemUtility(Utility.System);
+    }
+
+    private initializeModel() {
+        this._modelContainer = new ModelContainer();
     }
 
     update(elapseSeconds: number) {

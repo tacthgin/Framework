@@ -1,6 +1,7 @@
 import { Constructor } from "../../Base/DataStruct/Constructor";
 import { GameFrameworkError } from "../../Base/GameFrameworkError";
 import { GameFrameworkLinkedList, LinkedListNode } from "../../Base/GameFrameworkLinkedList";
+import { ISaveManager } from "../../Save/ISaveManager";
 import { IModel } from "./IModel";
 import { ModelBase } from "./ModelBase";
 
@@ -12,6 +13,7 @@ export class ModelContainer {
     private static s_nameConstructors: Map<Constructor<ModelBase>, string> = new Map<Constructor<ModelBase>, string>();
     private _models: GameFrameworkLinkedList<ModelBase> = null!;
     private _cachedModels: Map<Constructor<ModelBase>, ModelBase> = null!;
+    private _saveManager: ISaveManager | null = null;
 
     constructor() {
         this._models = new GameFrameworkLinkedList<ModelBase>();
@@ -40,6 +42,10 @@ export class ModelContainer {
         this._models.forEach((modelBase: ModelBase) => {
             modelBase.shutDown();
         });
+    }
+
+    setSaveManager(saveManager: ISaveManager) {
+        this._saveManager = saveManager;
     }
 
     /**

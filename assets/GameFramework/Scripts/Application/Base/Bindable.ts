@@ -5,7 +5,8 @@ export class Bindable<T> {
     private _eventPool: Map<BindableEventHandle<T>, any> = null!;
 
     constructor(defeult: T) {
-        this.value = defeult;
+        this._value = defeult;
+        this._eventPool = new Map<BindableEventHandle<T>, any>();
     }
 
     set value(value: T) {

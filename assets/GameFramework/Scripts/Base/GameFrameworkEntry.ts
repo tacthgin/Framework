@@ -9,8 +9,8 @@ export class GameFrameworkEntry {
     private static s_cachedGameFrameworkModule: Map<string, GameFrameworkModule> = new Map<string, GameFrameworkModule>();
 
     static update(elapseSeconds: number): void {
-        this.s_gameFrameworkModules.forEach((node: LinkedListNode<GameFrameworkModule>) => {
-            node.value.update(elapseSeconds);
+        this.s_gameFrameworkModules.forEach((module: GameFrameworkModule) => {
+            module.update(elapseSeconds);
         });
     }
 
@@ -46,9 +46,9 @@ export class GameFrameworkEntry {
         let module: GameFrameworkModule = new constructor() as GameFrameworkModule;
         let node: LinkedListNode<GameFrameworkModule> | null = null;
         if (this.s_gameFrameworkModules.size > 0) {
-            for (let listNode of this.s_gameFrameworkModules) {
-                if (module.priority >= listNode.value.priority) {
-                    node = listNode;
+            for (let current = this.s_gameFrameworkModules.first; current != null; current = current.next) {
+                if (module.priority >= current.value.priority) {
+                    node = current;
                     break;
                 }
             }
