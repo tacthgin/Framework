@@ -1,7 +1,9 @@
 import { Constructor } from "../Base/DataStruct/Constructor";
+import { IRerference } from "../Base/ReferencePool/IRerference";
+import { Variable } from "../Base/Variable/Variable";
 import { FsmState } from "./FsmState";
 
-export interface IFsm<T extends Constructor<T>> {
+export interface IFsm<T extends Constructor<T>> extends IRerference {
     readonly name: string;
 
     readonly owner: T;
@@ -12,7 +14,7 @@ export interface IFsm<T extends Constructor<T>> {
 
     readonly isDestroyed: boolean;
 
-    readonly currentState: FsmState<T>;
+    readonly currentState: FsmState<T> | null;
 
     readonly currentStateTime: number;
 
@@ -23,4 +25,12 @@ export interface IFsm<T extends Constructor<T>> {
     getState<TState extends FsmState<T>>(): FsmState<T>;
 
     getAllStates(): FsmState<T>[];
+
+    hasData(name: string): boolean;
+
+    getData<TData extends Variable<Object>>(name: string): TData;
+
+    setData<TData extends Variable<Object>>(name: string, data: TData): void;
+
+    removeData(name: string): boolean;
 }

@@ -1,44 +1,85 @@
+import { Constructor } from "../Base/DataStruct/Constructor";
+import { Variable } from "../Base/Variable/Variable";
+import { FsmBase } from "./FsmBase";
+import { FsmState } from "./FsmState";
+import { IFsm } from "./IFsm";
 
-import { _decorator, Component, Node } from 'cc';
-const { ccclass, property } = _decorator;
+export class Fsm<T extends Constructor<T>> extends FsmBase implements IFsm<T> {
+    private _owner: T | null = null;
+    private readonly _states: Map<Constructor<FsmState<T>>, FsmState<T>> = null!;
+    private _datas: Map<string, Variable<Object>> | null = null;
+    private _currentState: FsmState<T> | null = null;
+    private _isDestoryed: boolean = false;
 
-/**
- * Predefined variables
- * Name = Fsm
- * DateTime = Wed Dec 29 2021 14:25:07 GMT+0800 (中国标准时间)
- * Author = xiaobaitiancai
- * FileBasename = Fsm.ts
- * FileBasenameNoExtension = Fsm
- * URL = db://assets/GameFramework/Scripts/Fsm/Fsm.ts
- * ManualUrl = https://docs.cocos.com/creator/3.3/manual/zh/
- *
- */
- 
-@ccclass('Fsm')
-export class Fsm extends Component {
-    // [1]
-    // dummy = '';
-
-    // [2]
-    // @property
-    // serializableDummy = 0;
-
-    start () {
-        // [3]
+    constructor() {
+        super();
+        this._states = new Map<Constructor<FsmState<T>>, FsmState<T>>();
     }
 
-    // update (deltaTime: number) {
-    //     // [4]
-    // }
-}
+    get owner(): T {
+        return this._owner!;
+    }
 
-/**
- * [1] Class member could be defined like this.
- * [2] Use `property` decorator if your want the member to be serializable.
- * [3] Your initialization goes here.
- * [4] Your update function goes here.
- *
- * Learn more about scripting: https://docs.cocos.com/creator/3.3/manual/zh/scripting/
- * Learn more about CCClass: https://docs.cocos.com/creator/3.3/manual/zh/scripting/ccclass.html
- * Learn more about life-cycle callbacks: https://docs.cocos.com/creator/3.3/manual/zh/scripting/life-cycle-callbacks.html
- */
+    get currentState(): FsmState<T> | null {
+        return this._currentState;
+    }
+
+    get fsmStateCount(): number {
+        return this._states.size;
+    }
+
+    get isRunning(): boolean {
+        return this._currentState != null;
+    }
+
+    get isDestroyed(): boolean {
+        return this._isDestoryed;
+    }
+
+    get currentStateName(): string {
+        throw new Error("Method not implemented.");
+    }
+
+    get currentStateTime(): number {
+        throw new Error("Method not implemented.");
+    }
+
+    update(elapseSeconds: number): void {
+        throw new Error("Method not implemented.");
+    }
+
+    shutDown(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    start<TState extends FsmState<T>>(): void {
+        throw new Error("Method not implemented.");
+    }
+    hasState<TState extends FsmState<T>>(): boolean {
+        throw new Error("Method not implemented.");
+    }
+    getState<TState extends FsmState<T>>(): FsmState<T> {
+        throw new Error("Method not implemented.");
+    }
+    getAllStates(): FsmState<T>[] {
+        throw new Error("Method not implemented.");
+    }
+    hasData(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+    getData<TData extends Variable<Object>>(name: string): TData {
+        throw new Error("Method not implemented.");
+    }
+    setData<TData extends Variable<Object>>(name: string, data: TData): void {
+        throw new Error("Method not implemented.");
+    }
+    removeData(name: string): boolean {
+        throw new Error("Method not implemented.");
+    }
+
+    clear(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeState(stateConstructor: Constructor<FsmState<T>>): void {}
+}

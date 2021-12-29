@@ -1,7 +1,7 @@
 export abstract class FsmBase {
     private _name: string = "";
 
-    protected set name(value: string) {
+    set name(value: string) {
         this._name = value;
     }
 

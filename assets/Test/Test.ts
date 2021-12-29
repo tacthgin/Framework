@@ -36,6 +36,12 @@ class HelloWorldClass<T> implements IRerference {
     clear(): void {}
 }
 
+class HelloWorldClass1<T> implements IRerference {
+    public value: T | null = null;
+
+    clear(): void {}
+}
+
 interface A {}
 
 class C<T> {}
@@ -104,6 +110,8 @@ export class Test extends Component {
         let h2 = ReferencePool.acquire<HelloWorldClass<string>>(HelloWorldClass);
         h2.value = "333";
         let h3 = ReferencePool.acquire(HelloWorldClass);
+        let h5 = ReferencePool.acquire<HelloWorldClass<number>>(HelloWorldClass1);
+        h5.value = 1;
         console.log(ReferencePool.getAllReferencePoolInfos());
     }
 
