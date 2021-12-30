@@ -18,13 +18,13 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
 
     private readonly _objectPools: Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase> = null!;
     private readonly _cachedAllObjectPools: Array<ObjectPoolBase> = null!;
-    private readonly _constructorToPairMap: GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>> = null!;
+    private readonly _constructorToPair: GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>> = null!;
 
     constructor() {
         super();
         this._objectPools = new Map<ConstructorNamePair<ObjectBase>, ObjectPoolBase>();
         this._cachedAllObjectPools = new Array<ObjectPoolBase>();
-        this._constructorToPairMap = new GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>>();
+        this._constructorToPair = new GameFrameworkMap<Constructor<ObjectBase>, ConstructorNamePair<ObjectBase>>();
     }
 
     get priority(): number {
@@ -47,7 +47,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         });
         this._objectPools.clear();
         this._cachedAllObjectPools.length = 0;
-        this._constructorToPairMap.clear();
+        this._constructorToPair.clear();
     }
 
     hasObjectPool<T extends ObjectBase>(constructor: Constructor<T>, name?: string): boolean {
@@ -134,7 +134,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         if (constructorNamePair) {
             let objectPool = this._objectPools.get(constructorNamePair);
             objectPool?.shutDown();
-            this._constructorToPairMap.delete(constructor, constructorNamePair);
+            this._constructorToPair.delete(constructor, constructorNamePair);
             this._objectPools.delete(constructorNamePair);
             return true;
         }
@@ -160,7 +160,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
             throw new GameFrameworkError("constructor is invalid");
         }
 
-        let constructorNamePairs = this._constructorToPairMap.get(constructor);
+        let constructorNamePairs = this._constructorToPair.get(constructor);
         if (constructorNamePairs) {
             name = name || "";
             let node = constructorNamePairs.find((pair: ConstructorNamePair<ObjectBase>) => {
@@ -190,7 +190,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
 
         let objectPool = new ObjectPool<T>(name, allowMultiSpawn, autoReleaseInterval, capacity, expireTime, priority);
         let constructorNamePair = new ConstructorNamePair(constructor, name);
-        this._constructorToPairMap.set(constructor, constructorNamePair);
+        this._constructorToPair.set(constructor, constructorNamePair);
         this._objectPools.set(constructorNamePair, objectPool);
         return objectPool;
     }

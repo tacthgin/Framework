@@ -125,8 +125,8 @@ export class ModelContainer {
         });
 
         modelInfos.forEach((value) => {
-            value.model.load(value.value)
-        })
+            value.model.load(value.value);
+        });
     }
 
     /**
