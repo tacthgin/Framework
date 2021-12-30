@@ -5,6 +5,7 @@ import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { WebLogHelp } from "../Base/Log/WebLogHelp";
 import { IEventManager } from "../Event/IEventManager";
+import { IFsmManager } from "../Fsm/IFsmManager";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { ISaveManager } from "../Save/ISaveManager";
@@ -32,45 +33,52 @@ export class GameApp extends Component {
     }
 
     /**
-     * 资源管理
+     * 资源管理器
      */
     static get ResourceManager(): IResourceManager {
         return GameFrameworkEntry.getModule<IResourceManager>("ResourceManager");
     }
 
     /**
-     * 事件管理
+     * 事件管理器
      */
     static get EventManager(): IEventManager {
         return GameFrameworkEntry.getModule<IEventManager>("EventManager");
     }
 
     /**
-     * 对象池管理
+     * 对象池管理器
      */
     static get ObjectPoolManager(): IObejctPoolManager {
         return GameFrameworkEntry.getModule<IObejctPoolManager>("ObjectPoolManager");
     }
 
     /**
-     * 声音管理
+     * 声音管理器
      */
     static get SoundManager(): ISoundManager {
         return GameFrameworkEntry.getModule<ISoundManager>("SoundManager");
     }
 
     /**
-     * UI管理
+     * UI管理器
      */
     static get UIManager(): IUIManager {
         return GameFrameworkEntry.getModule<IUIManager>("UIManager");
     }
 
     /**
-     * 本地存储管理
+     * 本地存储管理器
      */
     static get SaveManager(): ISaveManager {
         return GameFrameworkEntry.getModule<ISaveManager>("SaveManager");
+    }
+
+    /**
+     * 有限状态机管理器
+     */
+    static get FsmManager(): IFsmManager {
+        return GameFrameworkEntry.getModule<IFsmManager>("FsmManager");
     }
 
     /**
@@ -130,6 +138,7 @@ export class GameApp extends Component {
 
     private initializeModel() {
         this._modelContainer = new ModelContainer();
+        this._modelContainer.setSaveManager(GameApp.SaveManager);
     }
 
     update(elapseSeconds: number) {
