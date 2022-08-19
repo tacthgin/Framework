@@ -1,7 +1,5 @@
 import { _decorator, Component, Node } from "cc";
-import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
-import { GameEventArgs } from "../GameFramework/Scripts/Event/GameEventArgs";
-import { IEventManager } from "../GameFramework/Scripts/Event/IEventManager";
+import { GameEventArgs } from "../GameFramework/Script/Event/GameEventArgs";
 const { ccclass, property } = _decorator;
 
 class CustomEventArgs extends GameEventArgs {

@@ -1,9 +1,9 @@
 {
+  "creator": {
+    "version": "3.6.0"
+  },
   "name": "Framework",
   "type": "3d",
   "uuid": "22aad21b-c226-4be6-8f81-30f31701101e",
-  "version": "3.3.2",
-  "creator": {
-    "version": "3.3.2"
-  }
+  "version": "3.6.0"
 }

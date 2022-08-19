@@ -1,26 +1,13 @@
-import { assetManager, Component, find, resources, Sprite, SpriteFrame, _decorator } from "cc";
-import { GameApp } from "../GameFramework/Scripts/Application/GameApp";
-import { Constructor } from "../GameFramework/Scripts/Base/DataStruct/Constructor";
-import { ConstructorNamePair } from "../GameFramework/Scripts/Base/DataStruct/ConstructorNamePair";
-import { GameFrameworkEntry } from "../GameFramework/Scripts/Base/GameFrameworkEntry";
-import { GameFrameworkError } from "../GameFramework/Scripts/Base/GameFrameworkError";
-import { GameFrameworkLinkedList } from "../GameFramework/Scripts/Base/GameFrameworkLinkedList";
-import { GameFrameworkMap } from "../GameFramework/Scripts/Base/GameFrameworkMap";
-import { GameFrameworkLog } from "../GameFramework/Scripts/Base/Log/GameFrameworkLog";
-import { WebLogHelp } from "../GameFramework/Scripts/Base/Log/WebLogHelp";
-import { IRerference } from "../GameFramework/Scripts/Base/ReferencePool/IRerference";
-import { ReferenceCollection } from "../GameFramework/Scripts/Base/ReferencePool/ReferenceCollection";
-import { ReferencePool } from "../GameFramework/Scripts/Base/ReferencePool/ReferencePool";
-import { EventManager } from "../GameFramework/Scripts/Event/EventManager";
-import { IEventManager } from "../GameFramework/Scripts/Event/IEventManager";
-import { IObejctPoolManager } from "../GameFramework/Scripts/ObjectPool/IObejctPoolManager";
-import { ObjectBase } from "../GameFramework/Scripts/ObjectPool/ObjectBase";
-import { ObjectPoolManager } from "../GameFramework/Scripts/ObjectPool/ObjectPoolManager";
-import { AstarFactory } from "../GameFramework/Scripts/ToolLibary/Astar/AstarFactory";
-import { IAstarMap } from "../GameFramework/Scripts/ToolLibary/Astar/IAstarMap";
-import { IVec2 } from "../GameFramework/Scripts/ToolLibary/Astar/IVec2";
-import { Utility } from "../GameFramework/Scripts/Utility/Utility";
-import { Test2 } from "./Test2";
+import { _decorator, Component, Sprite, SpriteFrame } from "cc";
+import { GameApp } from "../GameFramework/Application/GameApp";
+import { GameFrameworkError } from "../GameFramework/Script/Base/GameFrameworkError";
+import { IRerference } from "../GameFramework/Script/Base/ReferencePool/IRerference";
+import { ReferencePool } from "../GameFramework/Script/Base/ReferencePool/ReferencePool";
+import { ObjectBase } from "../GameFramework/Script/ObjectPool/ObjectBase";
+import { AstarFactory } from "../GameFramework/Script/ToolLibary/Astar/AstarFactory";
+import { IAstarMap } from "../GameFramework/Script/ToolLibary/Astar/IAstarMap";
+import { Utility } from "../GameFramework/Script/Utility/Utility";
+
 const { ccclass, property } = _decorator;
 
 class B extends ObjectBase {
@@ -46,6 +33,11 @@ interface A {}
 
 class C<T> {}
 
+interface IAstarVec2 {
+    x: number;
+    y: number;
+}
+
 class AstarMapTest implements IAstarMap {
     private map: Array<Array<number>> = new Array<Array<number>>(
         [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -68,11 +60,11 @@ class AstarMapTest implements IAstarMap {
         return this.map.length;
     }
 
-    check(position: IVec2): boolean {
+    check(position: IAstarVec2): boolean {
         return this.map[position.y][position.x] == 0;
     }
 
-    drawPath(path: IVec2[]) {
+    drawPath(path: IAstarVec2[]) {
         let copymap = Utility.System.clone(this.map) as Array<Array<number>>;
         path.forEach((position) => {
             copymap[position.y][position.x] = 2;
@@ -130,14 +122,14 @@ export class Test extends Component {
     }
 
     async testa() {
-        let id = await GameApp.SoundManager.playSound("Sound/attack");
-        console.log(id, GameApp.SoundManager.getSoundGroup("Sound/attack")?.soundAgentCount);
+        //let id = await GameApp.SoundManager.playSound("Sound/attack");
+        //console.log(id, GameApp.SoundManager.getSoundGroup("Sound/attack")?.soundAgentCount);
     }
 
     async testC() {
         console.log(Date.now());
-        let sp = await GameApp.ResourceManager.internalResourceLoader.loadAssetWithCallback("1/player_down_0", SpriteFrame, null, (err, data) => {
-            console.log(GameApp.ResourceManager.internalResourceLoader.getAsset("1/player_down_0", SpriteFrame), data);
+        let sp = await GameApp.ResourceManager.loadAssetWithCallback("1/player_down_0", SpriteFrame, null, (err, data) => {
+            console.log(GameApp.ResourceManager.getAsset("1/player_down_0", SpriteFrame), data);
         });
         console.log(Date.now());
     }
