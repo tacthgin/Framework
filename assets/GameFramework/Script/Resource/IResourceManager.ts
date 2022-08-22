@@ -12,6 +12,11 @@ import { IResourcePathHelper } from "./IResourcePathHelper";
  */
 export interface IResourceManager {
     /**
+     * 热更新辅助器
+     */
+    readonly hotUpdateHelper: IHotUpdateHelper;
+
+    /**
      * 设置内置的资源加载器
      * @param resourceLoaderHelper 资源加载辅助器
      */
@@ -120,31 +125,4 @@ export interface IResourceManager {
      * @param path 文件夹路径
      */
     releaseDir(path: string): void;
-
-    /**
-     * 开始热更新
-     * @param manifestUrl 热更链接
-     */
-    startHotUpdate(manifestUrl: string): void;
-
-    /**
-     * 设置热更回调
-     * @param failCallback 更新失败回调
-     * @param completeCallback 更新完成回调
-     * @param checkCompleteCallback 如果有更新，检查更新完毕回调
-     * @param bytesProgressCallback 字节数热更进度回调
-     * @param fileProgressCallback 文件热更进度回调
-     */
-    setHotUpdateCallback(
-        failCallback: (errorMessage: string) => void,
-        completeCallback: (restart: boolean) => void,
-        checkCompleteCallback?: () => void,
-        bytesProgressCallback?: ((progress: number, current: number, total: number) => void) | null,
-        fileProgressCallback?: ((progress: number, current: number, total: number) => void) | null
-    ): void;
-
-    /**
-     * 重新下载热更资源
-     */
-    retry(): void;
 }

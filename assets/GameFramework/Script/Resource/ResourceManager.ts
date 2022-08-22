@@ -23,6 +23,13 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     private readonly _bundleRegExp: RegExp = /^\$\w+\//;
     private _internaleResourceLoaderName: string = "";
 
+    get hotUpdateHelper(): IHotUpdateHelper {
+        if (!this._hotUpdateHelper) {
+            throw new GameFrameworkError("you must set hot update helper first");
+        }
+        return this._hotUpdateHelper;
+    }
+
     constructor() {
         super();
         this._resourceLoaders = new Map<string, ResourceLoader>();
@@ -169,32 +176,6 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
     releaseDir(path: string): void {
         let resourceLoaderInfo = this.internalGetBundle(path);
         resourceLoaderInfo.resourceLoader.releaseDir(resourceLoaderInfo.path);
-    }
-
-    startHotUpdate(manifestUrl: string): void {
-        if (!this._hotUpdateHelper) {
-            throw new GameFrameworkError("you must set hot update helper first");
-        }
-        this._hotUpdateHelper.startHotUpdate(manifestUrl);
-    }
-
-    setHotUpdateCallback(
-        failCallback: (errorMessage: string) => void,
-        completeCallback: (restart: boolean) => void,
-        fileProgressCallback: ((progress: number, current: number, total: number) => void) | null = null,
-        bytesProgressCallback: ((progress: number, current: number, total: number) => void) | null = null
-    ): void {
-        if (!this._hotUpdateHelper) {
-            throw new GameFrameworkError("you must set hot update helper first");
-        }
-        this._hotUpdateHelper.setHotUpdateCallback(failCallback, completeCallback, fileProgressCallback, bytesProgressCallback);
-    }
-
-    retry(): void {
-        if (!this._hotUpdateHelper) {
-            throw new GameFrameworkError("you must set hot update helper first");
-        }
-        this._hotUpdateHelper.retry();
     }
 
     /**
