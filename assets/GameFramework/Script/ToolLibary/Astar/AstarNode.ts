@@ -1,4 +1,4 @@
-import { IAstarVec2 } from "../../Base/GameStruct/IAstarVec2";
+import { IAstarVec2 } from "./IAstarVec2";
 
 /**
  * A*节点

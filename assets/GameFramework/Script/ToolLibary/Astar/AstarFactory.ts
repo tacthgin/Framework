@@ -1,5 +1,6 @@
 import { Astar } from "./Astar";
-import { CrossAstarHelp, CrossAstarHelper } from "./AstarHelper/CrossAstarHelper";
+import { CrossAstarHelper } from "./AstarHelper/CrossAstarHelper";
+import { EightDirectionAstarHelper } from "./AstarHelper/EightDirectionAstarHelper";
 import { IAstar } from "./IAstar";
 import { IAstarHelper } from "./IAstarHelper";
 import { IAstarMap } from "./IAstarMap";
