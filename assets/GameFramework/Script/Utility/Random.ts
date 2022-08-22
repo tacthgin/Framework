@@ -118,36 +118,44 @@ export class Random {
     }
 
     /**
-     * 从概率数组中，随机一个 [0.1, 0.2, 0.1, 0.3, 0.2, 0.1]
-     * @param array 概率数组
+     * 从权重概率数组中，随机一个元素
+     * @param array 权重概率数组
      * @returns 随机到的索引值，没有符合的索引返回-1
      */
-    randomFromArray(array: number[]): number {
-        let pro = this.getRandom();
+    randomWeightFromArray(array: number[]): number {
+        let totalWeight = array.reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+        let weight = this.randomInt(0, totalWeight);
         for (let i = 0; i < array.length; ++i) {
-            if (pro <= array[i]) {
+            if (weight <= array[i]) {
                 return i;
             } else {
-                pro -= array[i];
+                weight -= array[i];
             }
         }
+
         return -1;
     }
 
     /**
-     * 从概率字典中，随机一个 {"a": 0.1, "b": 0.6, "c": 0.3}
-     * @param map 概率字典
+     * 从权重概率字典中，随机一个元素
+     * @param map 权重概率字典
      * @returns 随机到的key值，没有符合的key值，返回空字符串
      */
-    randomFromMap(map: { [key: string]: number }): string {
-        let pro = this.getRandom();
+    randomWeightFromObject(map: { [key: string]: number }): string {
+        let totalWeight = 0;
         for (let key in map) {
-            if (pro <= map[key]) {
+            totalWeight += map[key];
+        }
+
+        let weight = this.randomInt(0, totalWeight);
+        for (let key in map) {
+            if (weight <= map[key]) {
                 return key;
             } else {
-                pro -= map[key];
+                weight -= map[key];
             }
         }
+
         return "";
     }
 
@@ -158,5 +166,26 @@ export class Random {
     private internalGetSeedRandom(): number {
         this._seed = (this._seed * 9301 + 49297) % 233280;
         return this._seed / 233280;
+    }
+
+    /**
+     * 高斯随机，不知道什么鬼
+     * @returns
+     */
+    private standardGaussianRandom() {
+        // Box-Muller transform method
+        let u = 0;
+        let v = 0;
+
+        while (u === 0) {
+            u = Math.random();
+        }
+
+        //Converting [0,1) to (0,1)
+        while (v === 0) {
+            v = Math.random();
+        }
+
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     }
 }
