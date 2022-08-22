@@ -3,7 +3,7 @@ import { IRerference } from "../Base/ReferencePool/IRerference";
 
 export abstract class ObjectBase implements IRerference {
     private _name: string = "";
-    private _target: object | null = null;
+    private _target: object = null!;
     private _locked: boolean = false;
     private _priority: number = 0;
     private _lastUseTime: number = 0;
@@ -14,7 +14,7 @@ export abstract class ObjectBase implements IRerference {
     }
 
     get target(): object {
-        return this._target!;
+        return this._target;
     }
 
     set locked(value: boolean) {
@@ -62,7 +62,7 @@ export abstract class ObjectBase implements IRerference {
 
     clear(): void {
         this._name = "";
-        this._target = null;
+        this._target = null!;
         this._locked = false;
         this._priority = 0;
         this._lastUseTime = 0;

@@ -2,7 +2,7 @@ import { GameFrameworkLinkedList } from "../Base/Container/GameFrameworkLinkedLi
 import { GameFrameworkMap } from "../Base/Container/GameFrameworkMap";
 import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
-import { FObject } from "./FObject";
+import { Object } from "./Object";
 import { IObjectPool } from "./IObjectPool";
 import { ObjectBase } from "./ObjectBase";
 import { ObjectInfo } from "./ObjectInfo";
@@ -13,8 +13,8 @@ import { ReleaseObjectFilterCallback } from "./ReleaseObjectFilterCallback";
  * 对象池
  */
 export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements IObjectPool<T> {
-    private readonly _objects: GameFrameworkMap<string, FObject<T>> = null!;
-    private readonly _objectMap: Map<object, FObject<T>> = null!;
+    private readonly _objects: GameFrameworkMap<string, Object<T>> = null!;
+    private readonly _objectMap: Map<object, Object<T>> = null!;
     private readonly _cachedCanReleaseObjects: Array<T> = null!;
     private readonly _cachedNeedReleaseObjects: Array<T> = null!;
     private _capacity: number = 0;
@@ -25,8 +25,8 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
 
     constructor(name: string, allowMultiSpawn: boolean, autoReleaseInterval: number, capacity: number, expireTime: number, priority: number) {
         super();
-        this._objects = new GameFrameworkMap<string, FObject<T>>();
-        this._objectMap = new Map<object, FObject<T>>();
+        this._objects = new GameFrameworkMap<string, Object<T>>();
+        this._objectMap = new Map<object, Object<T>>();
         this._cachedCanReleaseObjects = new Array<T>();
         this._cachedNeedReleaseObjects = new Array<T>();
         this._name = name;
@@ -130,14 +130,14 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
         }
     }
 
-    register(obj: T, spawned: boolean): void {
-        if (!obj) {
+    register(object: T, spawned: boolean): void {
+        if (!object) {
             throw new GameFrameworkError("object not exist");
         }
 
-        let internalObject = FObject.create(obj, spawned);
-        this._objectMap.set(obj.target, internalObject);
-        this._objects.set(obj.name, internalObject);
+        let internalObject = Object.create(object, spawned);
+        this._objectMap.set(object.target, internalObject);
+        this._objects.set(object.name, internalObject);
 
         if (this.count > this.capacity) {
             this.release();
@@ -208,7 +208,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
 
         let expireTime = 0;
         if (this._expireTime < Number.MAX_VALUE) {
-            expireTime = Date.now() - this._expireTime;
+            expireTime = Date.now() - this._expireTime * 1000;
         }
 
         releaseObjectFilterCallback = releaseObjectFilterCallback || this.defaultReleaseObjectFilterCallback;
@@ -228,10 +228,10 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
         });
     }
 
-    GetAllObjectInfos(): ObjectInfo[] {
+    getAllObjectInfos(): ObjectInfo[] {
         let results: ObjectInfo[] = [];
-        this._objects.forEach((internalObjects: GameFrameworkLinkedList<FObject<T>>) => {
-            internalObjects.forEach((internalObject: FObject<T>) => {
+        this._objects.forEach((internalObjects: GameFrameworkLinkedList<Object<T>>) => {
+            internalObjects.forEach((internalObject: Object<T>) => {
                 results.push(
                     new ObjectInfo(internalObject.name, internalObject.locked, internalObject.customCanReleaseFlag, internalObject.priority, internalObject.lastUseTime, internalObject.spawnCount)
                 );
@@ -248,7 +248,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
     }
 
     shutDown(): void {
-        this._objectMap.forEach((internalObject: FObject<T>) => {
+        this._objectMap.forEach((internalObject: Object<T>) => {
             internalObject.release(true);
             ReferencePool.release(internalObject);
         });
@@ -258,12 +258,12 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
         this._cachedNeedReleaseObjects.length = 0;
     }
 
-    private getObject(targetOrObject: object | T): FObject<T> | null {
+    private getObject(targetOrObject: object | T): Object<T> | null {
         if (!targetOrObject) {
             throw new GameFrameworkError("target or object not exist");
         }
 
-        let target: object | null = null;
+        let target: object = null!;
         if (targetOrObject instanceof ObjectBase) {
             target = targetOrObject.target;
         } else {
@@ -278,7 +278,7 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
             throw new GameFrameworkError("results is invailid");
         }
         results.length = 0;
-        this._objectMap.forEach((internalObject: FObject<T>) => {
+        this._objectMap.forEach((internalObject: Object<T>) => {
             if (internalObject.isInUse || internalObject.locked || !internalObject.customCanReleaseFlag) {
                 return;
             }

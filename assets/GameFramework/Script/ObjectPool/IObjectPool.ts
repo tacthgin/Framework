@@ -22,7 +22,7 @@ export interface IObjectPool<T extends ObjectBase> {
     autoReleaseInterval: number;
 
     /**
-     *  设置或者获取对象池过期时间。
+     *  设置或者获取对象池过期时间（固定时间）。
      */
     expireTime: number;
 
@@ -32,21 +32,25 @@ export interface IObjectPool<T extends ObjectBase> {
     priority: number;
 
     /**
-     *  设置对象池中对象优先级
+     * 设置对象池中对象优先级
+     * @param targetOrObject 对象或者存储的目标
+     * @param priority 优先级
      */
     setPriority(targetOrObject: object | T, priority: number): void;
 
     /**
-     *  锁定对象池中对象
+     * 锁定对象池中对象
+     * @param targetOrObject 对象或者存储的目标
+     * @param locked 是否加锁
      */
     setLocked(targetOrObject: object | T, locked: boolean): void;
 
     /**
      * 创建对象
-     * @param obj 对象
+     * @param object 对象
      * @param spawned 对象是否已被获取
      */
-    register(obj: T, spawned: boolean): void;
+    register(object: T, spawned: boolean): void;
 
     /**
      * 是否可以获取对象
@@ -60,12 +64,13 @@ export interface IObjectPool<T extends ObjectBase> {
 
     /**
      * 回收对象
-     * @param objectOrTarget
+     * @param objectOrTarget 对象或者存储的目标
      */
     upspawn(objectOrTarget: T | object): void;
 
     /**
      * 释放对象。
+     * @param objectOrTarget 对象或者存储的目标
      */
     releaseObject(objectOrTarget: T | object): boolean;
 

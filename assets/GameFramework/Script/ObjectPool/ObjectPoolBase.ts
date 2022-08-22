@@ -69,7 +69,7 @@ export abstract class ObjectPoolBase {
     /**
      * 获取对象池中所有对象信息
      */
-    abstract GetAllObjectInfos(): ObjectInfo[];
+    abstract getAllObjectInfos(): ObjectInfo[];
 
     /**
      * 更新对象池
