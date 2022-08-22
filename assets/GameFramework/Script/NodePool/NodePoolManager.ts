@@ -34,7 +34,10 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
 
     update(elapseSeconds: number): void {}
 
-    shutDown(): void {}
+    shutDown(): void {
+        this._nodePools.clear();
+        this._constructorToNameMap.clear();
+    }
 
     setResourceManager(resourceManager: IResourceManager): void {
         this._resourceManager = resourceManager;
