@@ -78,7 +78,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         });
 
         if (sort) {
-            results.sort(ObjectPoolManager.ObjectPoolComparer);
+            results.sort(ObjectPoolManager.objectPoolComparer);
         }
     }
 
@@ -195,7 +195,7 @@ export class ObjectPoolManager extends GameFrameworkModule implements IObejctPoo
         return objectPool;
     }
 
-    private static ObjectPoolComparer(left: ObjectPoolBase, right: ObjectPoolBase): number {
+    private static objectPoolComparer(left: ObjectPoolBase, right: ObjectPoolBase): number {
         return right.priority - left.priority;
     }
 }

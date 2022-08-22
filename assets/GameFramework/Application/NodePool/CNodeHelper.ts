@@ -7,8 +7,9 @@ export class CNodeHelper implements INodeHelper {
     }
 
     releaseNode(node: object): void {
-        if ((node as Node).parent) {
-            (node as Node).removeFromParent();
+        let ccNode = node as Node;
+        if (ccNode.parent) {
+            ccNode.removeFromParent();
         }
     }
 }

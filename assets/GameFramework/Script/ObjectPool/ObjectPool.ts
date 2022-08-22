@@ -159,9 +159,9 @@ export class ObjectPool<T extends ObjectBase> extends ObjectPoolBase implements 
 
         let objectList = this._objects.get(name);
         if (objectList) {
-            for (let fobject of objectList) {
-                if (this._allowMultiSpawn || !fobject.isInUse) {
-                    return fobject.spawn();
+            for (let object of objectList) {
+                if (this._allowMultiSpawn || !object.isInUse) {
+                    return object.spawn();
                 }
             }
         }

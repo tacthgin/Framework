@@ -20,8 +20,8 @@ export class NodeObject extends ObjectBase {
     }
 
     clear(): void {
-        super.clear();
         this._nodeHelper.releaseNode(this.target);
         this._nodeHelper = null!;
+        super.clear();
     }
 }
