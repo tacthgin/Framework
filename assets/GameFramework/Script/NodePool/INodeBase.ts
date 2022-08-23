@@ -1,5 +1,5 @@
 /**
- * 节点基类接口
+ * 节点基类
  */
 export interface INodeBase {
     readonly name: string;

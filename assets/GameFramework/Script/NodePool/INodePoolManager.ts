@@ -3,7 +3,7 @@ import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../ObjectPool/IObjectPool";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { INodeHelper } from "./INodeHelper";
-import { NodeBase } from "./NodeBase";
+import { INodeBase } from "./INodeBase";
 import { NodeObject } from "./NodeObject";
 
 /**
@@ -33,14 +33,14 @@ export interface INodePoolManager {
      * @param nodeConstructorOrNodePoolName 节点构造器或者节点池名称
      * @returns 是否有节点池
      */
-    hasNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): boolean;
+    hasNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): boolean;
 
     /**
      * 获取节点池
      * @param nodeConstructorOrNodePoolName 节点构造器或者节点池名称
      * @returns 获取节点池
      */
-    getNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject> | null;
+    getNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): IObjectPool<NodeObject> | null;
 
     /**
      * 创建节点池
@@ -48,14 +48,14 @@ export interface INodePoolManager {
      * @param nodeConstructor 第二索引，根据节点构造器获取节点池
      * @returns 获取节点池
      */
-    createNodePool<T extends NodeBase>(nodePoolName: string, nodeConstructor?: Constructor<T>): IObjectPool<NodeObject>;
+    createNodePool<T extends INodeBase>(nodePoolName: string, nodeConstructor?: Constructor<T>): IObjectPool<NodeObject>;
 
     /**
      * 清理节点池
      * @param nodeConstructorOrNodePoolName 节点构造器或者节点池名称
      * @returns 是否清理成功
      */
-    destroyNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): boolean;
+    destroyNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): boolean;
 
     /**
      * 创建节点
@@ -64,7 +64,7 @@ export interface INodePoolManager {
      * @param name 节点名称,用来区分同一种节点不同类型
      * @returns 创建的节点
      */
-    createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object;
+    createNode<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object;
 
     /**
      * 创建节点
@@ -73,7 +73,7 @@ export interface INodePoolManager {
      * @param name 节点名称,用来区分同一种节点不同类型
      * @returns 创建的节点
      */
-    createNodeWithPath<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object>;
+    createNodeWithPath<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object>;
 
     /**
      * 释放节点
@@ -81,5 +81,5 @@ export interface INodePoolManager {
      * @param node 节点
      * @returns 是否释放成功
      */
-    releaseNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean;
+    releaseNode<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean;
 }

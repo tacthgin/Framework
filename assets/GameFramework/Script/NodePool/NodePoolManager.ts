@@ -4,11 +4,10 @@ import { GameFrameworkError } from "../Base/GameFrameworkError";
 import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { IObejctPoolManager } from "../ObjectPool/IObejctPoolManager";
 import { IObjectPool } from "../ObjectPool/IObjectPool";
-import { ObjectPoolBase } from "../ObjectPool/ObjectPoolBase";
 import { IResourceManager } from "../Resource/IResourceManager";
 import { INodeHelper } from "./INodeHelper";
 import { INodePoolManager } from "./INodePoolManager";
-import { NodeBase } from "./NodeBase";
+import { INodeBase } from "./INodeBase";
 import { NodeObject } from "./NodeObject";
 
 /**
@@ -16,16 +15,16 @@ import { NodeObject } from "./NodeObject";
  */
 @GameFrameworkEntry.registerModule("NodePoolManager")
 export class NodePoolManager extends GameFrameworkModule implements INodePoolManager {
-    private readonly _nodePools: Map<string, ObjectPoolBase> = null!;
-    private readonly _constructorToNameMap: Map<Constructor<NodeBase>, string> = null!;
+    private readonly _nodePools: Map<string, IObjectPool<NodeObject>> = null!;
+    private readonly _constructorToNameMap: Map<Constructor<INodeBase>, string> = null!;
     private _resourceManager: IResourceManager | null = null;
     private _objectPoolManager: IObejctPoolManager | null = null;
     private _nodeHelper: INodeHelper | null = null;
 
     constructor() {
         super();
-        this._nodePools = new Map<string, ObjectPoolBase>();
-        this._constructorToNameMap = new Map<Constructor<NodeBase>, string>();
+        this._nodePools = new Map<string, IObjectPool<NodeObject>>();
+        this._constructorToNameMap = new Map<Constructor<INodeBase>, string>();
     }
 
     get priority(): number {
@@ -51,22 +50,22 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         this._nodeHelper = nodeHelper;
     }
 
-    hasNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
+    hasNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
         let nodePoolName = this.internalGetPoolName(nodeConstructorOrNodePoolName);
         return this._nodePools.has(nodePoolName);
     }
 
-    getNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): IObjectPool<NodeObject> | null {
+    getNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): IObjectPool<NodeObject> | null {
         let nodePoolName = this.internalGetPoolName(nodeConstructorOrNodePoolName);
         let objectPool = this._nodePools.get(nodePoolName);
         if (objectPool) {
-            return objectPool as unknown as IObjectPool<NodeObject>;
+            return objectPool;
         }
 
         return null;
     }
 
-    createNodePool<T extends NodeBase>(nodePoolName: string, nodeConstructor?: Constructor<T>): IObjectPool<NodeObject> {
+    createNodePool<T extends INodeBase>(nodePoolName: string, nodeConstructor?: Constructor<T>): IObjectPool<NodeObject> {
         if (!nodePoolName) {
             throw new GameFrameworkError("nodePoolName is invalid");
         }
@@ -80,7 +79,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             throw new GameFrameworkError("you must set object pool manager first");
         }
 
-        objectPool = this._objectPoolManager.createSingleSpawnObjectPoolBase(NodeObject, nodePoolName);
+        objectPool = this._objectPoolManager.createSingleSpawnObjectPool(NodeObject, nodePoolName);
         this._nodePools.set(nodePoolName, objectPool);
         if (nodeConstructor) {
             if (this._constructorToNameMap.has(nodeConstructor)) {
@@ -90,10 +89,10 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
             }
         }
 
-        return objectPool as unknown as IObjectPool<NodeObject>;
+        return objectPool;
     }
 
-    destroyNodePool<T extends NodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
+    destroyNodePool<T extends INodeBase>(nodeConstructorOrNodePoolName: string | Constructor<T>): boolean {
         if (typeof nodeConstructorOrNodePoolName === "string" && !nodeConstructorOrNodePoolName) {
             throw new GameFrameworkError("node pool name is invalid");
         }
@@ -111,7 +110,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return false;
     }
 
-    createNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object {
+    createNode<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, asset: object, name?: string): object {
         if (!this._nodeHelper) {
             throw new GameFrameworkError("you must set node help first");
         }
@@ -132,7 +131,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return nodeObject.target as T;
     }
 
-    async createNodeWithPath<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object> {
+    async createNodeWithPath<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, assetPath: string, name?: string): Promise<object> {
         if (!this._resourceManager) {
             throw new GameFrameworkError("you must set resource manager first");
         }
@@ -148,7 +147,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
         return this.createNode(nodeConstructorOrNodePoolName, asset, name);
     }
 
-    releaseNode<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean {
+    releaseNode<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string, node: object): boolean {
         let objectPool = this.getNodePool(nodeConstructorOrNodePoolName);
         if (objectPool) {
             objectPool.upspawn(node);
@@ -162,7 +161,7 @@ export class NodePoolManager extends GameFrameworkModule implements INodePoolMan
      * @param nodeConstructorOrNodePoolName 节点池名字或者节点构造器
      * @returns 节点池名字
      */
-    private internalGetPoolName<T extends NodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): string {
+    private internalGetPoolName<T extends INodeBase>(nodeConstructorOrNodePoolName: Constructor<T> | string): string {
         return typeof nodeConstructorOrNodePoolName === "string" ? nodeConstructorOrNodePoolName : this._constructorToNameMap.get(nodeConstructorOrNodePoolName) || "";
     }
 }
