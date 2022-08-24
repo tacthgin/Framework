@@ -1,4 +1,4 @@
-import { assetManager, Component, Constructor, game, resources, _decorator } from "cc";
+import { assetManager, Component, Constructor, director, resources, _decorator } from "cc";
 import { GameFrameworkEntry } from "../Script/Base/GameFrameworkEntry";
 import { GameFrameworkError } from "../Script/Base/GameFrameworkError";
 import { GameFrameworkLog } from "../Script/Base/Log/GameFrameworkLog";
@@ -8,6 +8,7 @@ import { CommandManager } from "../Script/MVC/Command/CommandManager";
 import { ICommandManager } from "../Script/MVC/Command/ICommandManager";
 import { IModel } from "../Script/MVC/Model/IModel";
 import { ModelManager } from "../Script/MVC/Model/ModelManager";
+import { TimeManager } from "../Script/Time/TimeManager";
 import { INodePoolManager } from "../Script/NodePool/INodePoolManager";
 import { IObejctPoolManager } from "../Script/ObjectPool/IObejctPoolManager";
 import { IResourceManager } from "../Script/Resource/IResourceManager";
@@ -149,7 +150,7 @@ export class GameApp extends Component {
         } else {
             ++GameApp._referenceCount;
             GameApp._instance = this;
-            game.addPersistRootNode(this.node);
+            director.addPersistRootNode(this.node);
         }
         this.initialize();
     }
@@ -177,9 +178,7 @@ export class GameApp extends Component {
         //初始化框架
         this.initalizeFramework();
         //初始化command
-        this.initializeCommand();
-        //初始化model
-        this.initializeModel();
+        this.initializeMVC();
         //初始化平台
         this.initializePlatform();
         //初始化热更新
@@ -204,8 +203,8 @@ export class GameApp extends Component {
         if (uiFormHelper) {
             uiManager.setUIFormHelper(uiFormHelper);
             //创建弹窗和toast的ui组
-            uiManager.addUIGroup(UIConstant.DIALOG_LAYER_GROUP, 0, uiFormHelper.getDialogUIGroupHelp());
-            uiManager.addUIGroup(UIConstant.TOAST_LAYER_GROUP, 1, uiFormHelper.getToastUIGroupHelp());
+            uiManager.addUIGroup(UIConstant.DIALOG_LAYER_GROUP, 0, uiFormHelper.getDialogUIGroupHelper());
+            uiManager.addUIGroup(UIConstant.TOAST_LAYER_GROUP, 1, uiFormHelper.getToastUIGroupHelper());
         } else {
             throw new GameFrameworkError("you must set ui form help first");
         }
@@ -236,12 +235,10 @@ export class GameApp extends Component {
         Utility.Json.setSystemUtility(Utility.System);
     }
 
-    private initializeModel() {
+    private initializeMVC() {
         this._modelManager = new ModelManager();
         this._modelManager.setSaveManager(GameApp.SaveManager);
-    }
 
-    private initializeCommand() {
         this._commandManager = new CommandManager();
         this._commandManager.setObjectPoolManager(GameApp.ObjectPoolManager);
     }
@@ -260,6 +257,6 @@ export class GameApp extends Component {
 
     update(elapseSeconds: number) {
         GameFrameworkEntry.update(elapseSeconds);
-        this._commandManager.update(elapseSeconds);
+        TimeManager.update(elapseSeconds);
     }
 }

@@ -1,16 +1,14 @@
 import { IScheduleBase } from "./IScheduleBase";
-import { ScheduleManager } from "./ScheduleManager";
+import { TimeManager } from "../TimeManager";
 
 export class ScheduleBase implements IScheduleBase {
     private _isUpdate: boolean = false;
+    private _isFiexedUpdate: boolean = false;
 
     set isUpdate(value: boolean) {
+        if (this._isUpdate === value) return;
         this._isUpdate = value;
-        if (this._isUpdate) {
-            ScheduleManager.addToUpdatePool(this);
-        } else {
-            ScheduleManager.removeFromUpdatePool(this);
-        }
+        TimeManager.addOrRemoveFromUpdatePool(this, this._isUpdate);
     }
 
     /** 是否需要每帧更新 */
@@ -18,9 +16,21 @@ export class ScheduleBase implements IScheduleBase {
         return this._isUpdate;
     }
 
+    set isFixedUpdate(value: boolean) {
+        if (this._isFiexedUpdate === value) return;
+        this._isFiexedUpdate = value;
+        TimeManager.addOrRemoveFromFixedUpdatePool(this, this._isFiexedUpdate);
+    }
+
+    /** 是否需要每物理帧更新 */
+    get isFixedUpdate(): boolean {
+        return this._isFiexedUpdate;
+    }
+
     clear(): void {
         this.unscheduleAll();
         this.isUpdate = false;
+        this.isFixedUpdate = false;
     }
 
     /**
@@ -31,7 +41,7 @@ export class ScheduleBase implements IScheduleBase {
      * @param priority 定时器优先级
      */
     schedule(handler: Function, interval: number, count: number = Number.MAX_SAFE_INTEGER, priority: number = 0): void {
-        ScheduleManager.schedule(handler, this, interval, count, priority);
+        TimeManager.schedule(handler, this, interval, count, priority);
     }
 
     /**
@@ -49,14 +59,14 @@ export class ScheduleBase implements IScheduleBase {
      * @param handler 回调函数
      */
     unschedule(handler: Function): void {
-        ScheduleManager.unschedule(handler, this);
+        TimeManager.unschedule(handler, this);
     }
 
     /**
      * 取消所有定时器
      */
     unscheduleAll(): void {
-        ScheduleManager.unscheduleAll(this);
+        TimeManager.unscheduleAll(this);
     }
 
     /**

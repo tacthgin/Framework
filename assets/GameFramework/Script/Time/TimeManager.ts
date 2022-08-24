@@ -1,35 +1,65 @@
-import { GameFrameworkLinkedList, LinkedListNode } from "../../Base/Container/GameFrameworkLinkedList";
-import { GameFrameworkMap } from "../../Base/Container/GameFrameworkMap";
-import { GameFrameworkError } from "../../Base/GameFrameworkError";
-import { ReferencePool } from "../../Base/ReferencePool/ReferencePool";
-import { IScheduleBase } from "./IScheduleBase";
-import { ScheduleInfo } from "./ScheduleInfo";
+import { GameFrameworkLinkedList, LinkedListNode } from "../Base/Container/GameFrameworkLinkedList";
+import { GameFrameworkMap } from "../Base/Container/GameFrameworkMap";
+import { GameFrameworkError } from "../Base/GameFrameworkError";
+import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
+import { IScheduleBase } from "./Schedule/IScheduleBase";
+import { ScheduleInfo } from "./Schedule/ScheduleInfo";
 
 /**
- * 定时器管理器
+ * 时间管理器
  */
-export class ScheduleManager {
+export class TimeManager {
     /** 定时器句柄 */
     private static readonly _scheduleHandlers: GameFrameworkLinkedList<ScheduleInfo> = new GameFrameworkLinkedList<ScheduleInfo>();
-    /** 定时器信息表 */
-    private static readonly _scheduleMap: GameFrameworkMap<IScheduleBase, ScheduleInfo> = new GameFrameworkMap<IScheduleBase, ScheduleInfo>();
-    /** 帧更新表 */
-    private static readonly _updateMap: Set<IScheduleBase> = new Set<IScheduleBase>();
+    /** 定时器信息字典 */
+    private static readonly _scheduleInfoMap: GameFrameworkMap<IScheduleBase, ScheduleInfo> = new GameFrameworkMap<IScheduleBase, ScheduleInfo>();
+    /** 帧更新集合 */
+    private static readonly _updateSet: Set<IScheduleBase> = new Set<IScheduleBase>();
+    /** 物理帧更新集合 */
+    private static readonly _fixedUpdateSet: Set<IScheduleBase> = new Set<IScheduleBase>();
+    /** 物理步长 */
+    private static _fixedTimeStep: number = 1 / 60;
+    /** 物理累计时间 */
+    private static _fixedCurrentTime: number = 0;
 
-    /**
-     * 加入帧更新池
-     * @param target 定时器目标
-     */
-    static addToUpdatePool(target: IScheduleBase): void {
-        this._updateMap.add(target);
+    static set fixedTimeStep(value: number) {
+        this._fixedTimeStep = value;
     }
 
     /**
-     * 从帧更新池移除
-     * @param target 定时器目标
+     * 物理步长
      */
-    static removeFromUpdatePool(target: IScheduleBase): void {
-        this._updateMap.delete(target);
+    static get fixedTimeStep(): number {
+        return this._fixedTimeStep;
+    }
+
+    /**
+     * 从帧更新池放入或者拿出
+     * @param target 定时器目标
+     * @param addOrRemove 放入(true)还是拿出(false)
+     */
+    static addOrRemoveFromUpdatePool(target: IScheduleBase, addOrRemove: boolean): void {
+        if (addOrRemove) {
+            this._updateSet.add(target);
+        } else {
+            this._updateSet.delete(target);
+        }
+    }
+
+    /**
+     * 从物理帧更新池放入或者拿出
+     * @param target 定时器目标
+     * @param addOrRemove 放入(true)还是拿出(false)
+     */
+    static addOrRemoveFromFixedUpdatePool(target: IScheduleBase, addOrRemove: boolean): void {
+        if (addOrRemove) {
+            this._fixedUpdateSet.add(target);
+        } else {
+            this._fixedUpdateSet.delete(target);
+            if (this._fixedUpdateSet.size == 0) {
+                this._fixedCurrentTime = 0;
+            }
+        }
     }
 
     /**
@@ -60,7 +90,7 @@ export class ScheduleManager {
             this._scheduleHandlers.addLast(currentScheduleInfo);
         }
 
-        this._scheduleMap.set(target, currentScheduleInfo);
+        this._scheduleInfoMap.set(target, currentScheduleInfo);
     }
 
     /**
@@ -69,7 +99,7 @@ export class ScheduleManager {
      * @param target 定时器目标
      */
     static unschedule(handler: Function, target: IScheduleBase): void {
-        let scheduleHandles = this._scheduleMap.get(target);
+        let scheduleHandles = this._scheduleInfoMap.get(target);
         if (scheduleHandles) {
             let node = scheduleHandles.find((scheduleInfo: ScheduleInfo) => {
                 return scheduleInfo.handler === handler && scheduleInfo.target === target;
@@ -88,7 +118,7 @@ export class ScheduleManager {
      * @param target 定时器目标
      */
     static unscheduleAll(target: IScheduleBase): void {
-        let scheduleHandles = this._scheduleMap.get(target);
+        let scheduleHandles = this._scheduleInfoMap.get(target);
         if (scheduleHandles) {
             let current = scheduleHandles.first;
             let next: LinkedListNode<ScheduleInfo> | null = null;
@@ -108,11 +138,12 @@ export class ScheduleManager {
      * @param elapseSeconds 逻辑流逝时间
      */
     static update(elapseSeconds: number): void {
+        this.internalFixedUpdate(elapseSeconds);
         this.internalUpdate(elapseSeconds);
     }
 
     /**
-     * 内部轮询定时器
+     * 每帧轮询
      * @param elapseSeconds 逻辑流逝时间
      */
     private static internalUpdate(elapseSeconds: number): void {
@@ -127,7 +158,7 @@ export class ScheduleManager {
                     next = current.next;
                     ReferencePool.release(value);
                     this._scheduleHandlers.remove(current);
-                    this._scheduleMap.delete(value.target, value);
+                    this._scheduleInfoMap.delete(value.target, value);
                     current = next;
                 } else {
                     current = current.next;
@@ -135,9 +166,26 @@ export class ScheduleManager {
             }
         }
 
-        if (this._updateMap.size > 0) {
-            for (let scheduleBase of this._updateMap) {
+        if (this._updateSet.size > 0) {
+            for (let scheduleBase of this._updateSet) {
                 scheduleBase.update(elapseSeconds);
+            }
+        }
+    }
+
+    /**
+     * 每物理帧轮询
+     * @param elapseSeconds 逻辑流逝时间
+     */
+    private static internalFixedUpdate(elapseSeconds: number): void {
+        if (this._fixedUpdateSet.size > 0) {
+            this._fixedCurrentTime += elapseSeconds;
+            while (this._fixedCurrentTime >= this._fixedTimeStep) {
+                for (let scheduleBase of this._fixedUpdateSet) {
+                    scheduleBase.fixedUpdate && scheduleBase.fixedUpdate(this._fixedTimeStep);
+                }
+
+                this._fixedCurrentTime -= this._fixedTimeStep;
             }
         }
     }
