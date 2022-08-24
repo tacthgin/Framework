@@ -1,7 +1,7 @@
 import { Constructor } from "../Base/DataStruct/Constructor";
 import { IAsset } from "./Asset/IAsset";
 import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
-import { OptionBundle, OptionExt } from "./Asset/IOption";
+import { IOptionBundle, IOptionExt } from "./Asset/IOption";
 import { IHotUpdateHelper } from "./IHotUpdateHelper";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
@@ -46,7 +46,7 @@ export interface IResourceManager {
      * @param options bundle附加选项
      * @returns 加载的资源加载器
      */
-    loadBundle(bundleNameOrUrl: string, options?: OptionBundle): Promise<IResourceLoader | null>;
+    loadBundle(bundleNameOrUrl: string, options?: IOptionBundle): Promise<IResourceLoader | null>;
 
     /**
      * 获取资源加载器
@@ -97,7 +97,7 @@ export interface IResourceManager {
      * @param options 远程资源附加扩展名
      * @returns 加载的远程资源
      */
-    loadRemote(url: string, options?: OptionExt): Promise<IAsset | null>;
+    loadRemote(url: string, options?: IOptionExt): Promise<IAsset | null>;
 
     /**
      * 获取已经缓存的资源

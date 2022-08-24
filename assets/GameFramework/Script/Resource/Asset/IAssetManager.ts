@@ -1,6 +1,6 @@
 import { IResourceLoaderHelper } from "../IResourceLoaderHelper";
 import { IAsset } from "./IAsset";
-import { OptionBundle, OptionExt } from "./IOption";
+import { IOptionBundle, IOptionExt } from "./IOption";
 import { IRequestItem } from "./IRequestItem";
 
 /**
@@ -23,7 +23,7 @@ export interface IAssetManager {
      * @param options 选项参数
      * @param onComplete 加载完成回调
      */
-    loadRemote<T extends IAsset>(url: string, options: OptionExt | null, onComplete?: ResourceCompleteCallback<T> | null): void;
+    loadRemote<T extends IAsset>(url: string, options: IOptionExt | null, onComplete?: ResourceCompleteCallback<T> | null): void;
 
     /**
      * 加载bundle
@@ -31,7 +31,7 @@ export interface IAssetManager {
      * @param options bundle选项参数
      * @param onComplete 加载完成回调
      */
-    loadBundle(nameOrUrl: string, options: OptionBundle | null, onComplete?: ResourceCompleteCallback<IResourceLoaderHelper> | null): void;
+    loadBundle(nameOrUrl: string, options: IOptionBundle | null, onComplete?: ResourceCompleteCallback<IResourceLoaderHelper> | null): void;
 
     /**
      * 释放资源

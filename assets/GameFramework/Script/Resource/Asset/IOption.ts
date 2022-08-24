@@ -1,14 +1,14 @@
 /**
  * 扩展选项
  */
-export interface OptionExt {
+export interface IOptionExt {
     ext?: string;
 }
 
 /**
  * bundle选项
  */
-export interface OptionBundle {
+export interface IOptionBundle {
     version?: string;
     scriptAsyncLoading?: boolean;
 }

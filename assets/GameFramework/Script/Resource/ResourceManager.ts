@@ -5,7 +5,7 @@ import { GameFrameworkModule } from "../Base/GameFrameworkModule";
 import { GameFrameworkLog } from "../Base/Log/GameFrameworkLog";
 import { IAsset } from "./Asset/IAsset";
 import { IAssetManager, ResourceCompleteCallback, ResourceProgressCallback } from "./Asset/IAssetManager";
-import { OptionBundle, OptionExt } from "./Asset/IOption";
+import { IOptionBundle, IOptionExt } from "./Asset/IOption";
 import { IHotUpdateHelper } from "./IHotUpdateHelper";
 import { IResourceLoader } from "./IResourceLoader";
 import { IResourceLoaderHelper } from "./IResourceLoaderHelper";
@@ -79,7 +79,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         this._resourcePathHelper = resourcePathHelper;
     }
 
-    loadBundle(bundleNameOrUrl: string, options?: OptionBundle): Promise<IResourceLoader | null> {
+    loadBundle(bundleNameOrUrl: string, options?: IOptionBundle): Promise<IResourceLoader | null> {
         return new Promise<IResourceLoader | null>((resolve) => {
             let bundleName = this.getBundleName(bundleNameOrUrl);
             let resourceLoader = this.getResourceLoader(bundleName);
@@ -127,7 +127,7 @@ export class ResourceManager extends GameFrameworkModule implements IResourceMan
         return resourceLoaderInfo.resourceLoader.loadDirWithCallback(resourceLoaderInfo.path, assetType, onProgress, onComplete);
     }
 
-    loadRemote(url: string, options?: OptionExt): Promise<IAsset | null> {
+    loadRemote(url: string, options?: IOptionExt): Promise<IAsset | null> {
         return new Promise((resolve) => {
             let asset = this.getRemoteAsset(url);
             if (asset) {
