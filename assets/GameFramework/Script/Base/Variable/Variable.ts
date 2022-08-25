@@ -2,14 +2,14 @@ import { IRerference } from "../ReferencePool/IRerference";
 import { ReferencePool } from "../ReferencePool/ReferencePool";
 
 export class Variable<T> implements IRerference {
-    private _value: T | null = null;
+    private _value: T = null!;
 
     set value(value: T) {
         this._value = value;
     }
 
     get value(): T {
-        return this._value!;
+        return this._value;
     }
 
     static create<T>(value: T): Variable<T> {
@@ -19,6 +19,6 @@ export class Variable<T> implements IRerference {
     }
 
     clear(): void {
-        this._value = null;
+        this._value = null!;
     }
 }
