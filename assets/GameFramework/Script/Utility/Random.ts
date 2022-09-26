@@ -4,62 +4,61 @@
 export class Random {
     /** 随机种子,默认为当前时间戳 */
     private _seed: number = Date.now();
-    /** 使用系统的随机函数 */
-    private _systemFlag: boolean = true;
+    /** 使用的随机函数 */
+    private _randomFunc: Function = null!;
 
-    /**
-     * 设置使用系统随机函数标志
-     */
-    set systemFlag(value: boolean) {
-        this._systemFlag = value;
+    set seed(value: number) {
+        this._seed = value;
     }
 
     /**
-     * 获取使用系统随机函数标志
+     * 随机种子
      */
-    get systemFlag(): boolean {
-        return this._systemFlag;
+    get seed(): number {
+        return this._seed;
     }
 
     /**
      * 创建随机数,如果设置了随机种子，使用自定义随机
-     * @param systemFlag 设置使用系统的随机函数
      * @param seed 随机种子
      */
-    static create(systemFlag: boolean = true, seed: number | null = null): Random {
+    static create(seed: number | null = null): Random {
         let random = new Random();
-        random._systemFlag = systemFlag;
-        if (seed !== null) {
-            random.setSeed(seed);
+        let useSystemRandom = seed === null;
+        if (!useSystemRandom) {
+            random.seed = seed!;
         }
+        random.internalSetRandomFunction(useSystemRandom);
         return random;
-    }
-
-    /**
-     * 设置随机种子
-     * @param seed 种子
-     */
-    setSeed(seed: number): void {
-        this._systemFlag = false;
-        this._seed = seed;
     }
 
     /**
      * 获取随机数
      * @returns
      */
-    getRandom(): number {
-        return this._systemFlag ? Math.random() : this.internalGetSeedRandom();
+    random(): number {
+        return this._randomFunc();
     }
 
     /**
-     * 任意数范围随机，这个值不小于 min（有可能等于），并且小于（不等于）max
-     * @param min 最小值
-     * @param max 最大值
-     * @returns 随机到的任意数
+     * 高斯随机，不知道什么鬼
+     * @returns
      */
-    random(min: number, max: number): number {
-        return this.getRandom() * (max - min) + min;
+    standardGaussianRandom(): number {
+        // Box-Muller transform method
+        let u = 0;
+        let v = 0;
+
+        while (u === 0) {
+            u = this.random();
+        }
+
+        //Converting [0,1) to (0,1)
+        while (v === 0) {
+            v = this.random();
+        }
+
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     }
 
     /**
@@ -68,10 +67,10 @@ export class Random {
      * @param max 最大值
      * @returns 随机到的整数
      */
-    randomInt(min: number, max: number): number {
+    randomRange(min: number, max: number): number {
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(this.getRandom() * (max - min + 1)) + min;
+        return Math.floor(this.random() * (max - min + 1)) + min;
     }
 
     /**
@@ -83,7 +82,7 @@ export class Random {
         if (array.length == 0) {
             return null;
         }
-        return array[this.randomInt(0, array.length - 1)];
+        return array[this.randomRange(0, array.length - 1)];
     }
 
     /**
@@ -104,7 +103,7 @@ export class Random {
         let length = -1;
         while (randomIndexs.length < count) {
             length = array.length - randomIndexs.length;
-            let index = Math.floor(this.getRandom() * length);
+            let index = Math.floor(this.random() * length);
             randomIndexs.push(indexes[index] || index);
             indexes[index] = indexes[length - 1] || length - 1;
         }
@@ -124,7 +123,7 @@ export class Random {
      */
     randomWeightFromArray(array: number[]): number {
         let totalWeight = array.reduce((previousValue, currentValue) => previousValue + currentValue, 0);
-        let weight = this.randomInt(0, totalWeight);
+        let weight = this.randomRange(0, totalWeight);
         for (let i = 0; i < array.length; ++i) {
             if (weight <= array[i]) {
                 return i;
@@ -147,7 +146,7 @@ export class Random {
             totalWeight += map[key];
         }
 
-        let weight = this.randomInt(0, totalWeight);
+        let weight = this.randomRange(0, totalWeight);
         for (let key in map) {
             if (weight <= map[key]) {
                 return key;
@@ -168,24 +167,7 @@ export class Random {
         return this._seed / 233280;
     }
 
-    /**
-     * 高斯随机，不知道什么鬼
-     * @returns
-     */
-    private standardGaussianRandom() {
-        // Box-Muller transform method
-        let u = 0;
-        let v = 0;
-
-        while (u === 0) {
-            u = Math.random();
-        }
-
-        //Converting [0,1) to (0,1)
-        while (v === 0) {
-            v = Math.random();
-        }
-
-        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    private internalSetRandomFunction(useSystemRandom: boolean) {
+        this._randomFunc = useSystemRandom ? Math.random : this.internalGetSeedRandom.bind(this);
     }
 }
