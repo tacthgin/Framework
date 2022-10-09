@@ -8,15 +8,15 @@ import { UIFormInfo } from "./UIFormInfo";
 
 export class UIGroup implements IUIGroup {
     private readonly _uiFormInfos: GameFrameworkLinkedList<UIFormInfo> = null!;
-    private _name: string = null!;
-    private _uiGroupHelp: IUIGroupHelper = null!;
+    private _name: string = "";
+    private _uiGroupHelper: IUIGroupHelper = null!;
     private _depth: number = 0;
     private _pause: boolean = false;
 
-    constructor(name: string, depth: number, uiGroupHelp: IUIGroupHelper) {
+    constructor(name: string, depth: number, uiGroupHelper: IUIGroupHelper) {
         this._name = name;
         this._depth = depth;
-        this._uiGroupHelp = uiGroupHelp;
+        this._uiGroupHelper = uiGroupHelper;
         this._uiFormInfos = new GameFrameworkLinkedList<UIFormInfo>();
     }
 
@@ -29,7 +29,7 @@ export class UIGroup implements IUIGroup {
             return;
         }
         this._depth = value;
-        this._uiGroupHelp.setDepth(this._depth);
+        this._uiGroupHelper.setDepth(this._depth);
         this.refresh();
     }
 
@@ -58,7 +58,7 @@ export class UIGroup implements IUIGroup {
     }
 
     get helper(): IUIGroupHelper {
-        return this._uiGroupHelp;
+        return this._uiGroupHelper;
     }
 
     update(elapseSeconds: number): void {

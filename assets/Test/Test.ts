@@ -1,12 +1,14 @@
 import { _decorator, Component, Sprite, SpriteFrame } from "cc";
-import { GameApp } from "../GameFramework/Application/GameApp";
+import { GameApp } from "../GameFramework/Application/Base/GameApp";
 import { GameFrameworkError } from "../GameFramework/Script/Base/GameFrameworkError";
 import { IRerference } from "../GameFramework/Script/Base/ReferencePool/IRerference";
 import { ReferencePool } from "../GameFramework/Script/Base/ReferencePool/ReferencePool";
+import { Bindable } from "../GameFramework/Script/Base/Variable/Bindable";
 import { ObjectBase } from "../GameFramework/Script/ObjectPool/ObjectBase";
-import { AstarFactory } from "../GameFramework/Script/ToolLibary/Astar/AstarFactory";
-import { IAstarMap } from "../GameFramework/Script/ToolLibary/Astar/IAstarMap";
+import { ScheduleBase } from "../GameFramework/Script/Time/Schedule/ScheduleBase";
 import { Utility } from "../GameFramework/Script/Utility/Utility";
+import { AstarFactory } from "../GameFramework/ToolLibary/Astar/AstarFactory";
+import { IAstarMap } from "../GameFramework/ToolLibary/Astar/IAstarMap";
 
 const { ccclass, property } = _decorator;
 
@@ -80,6 +82,57 @@ class AstarMapTest implements IAstarMap {
     }
 }
 
+class ScheduleText extends ScheduleBase {
+    async test1() {
+        while (1) {
+            console.log("ScheduleText", Date.now());
+            await this.sleep(2);
+        }
+    }
+}
+
+class BindableTest {
+    public a: Bindable<number> = Bindable.create(0);
+}
+
+class BindableTest1 {
+    registerEvent(bindableTest: BindableTest) {
+        bindableTest.a.subscribe(this.onBindTest1, this);
+        bindableTest.a.subscribe(this.onBindTest2, this);
+    }
+
+    unregisterEvent(bindableTest: BindableTest) {
+        bindableTest.a.unsubscribeTarget(this);
+    }
+
+    onBindTest1(value: number) {
+        console.log("BindableTest1 onBindTest1", value);
+    }
+
+    onBindTest2(value: number) {
+        console.log("BindableTest1 onBindTest2", value);
+    }
+}
+
+class BindableTest2 {
+    registerEvent(bindableTest: BindableTest) {
+        bindableTest.a.subscribe(this.onBindTest1);
+        bindableTest.a.subscribe(this.onBindTest2, this);
+    }
+
+    unregisterEvent(bindableTest: BindableTest) {
+        bindableTest.a.unsubscribeTarget(this);
+    }
+
+    onBindTest1(value: number) {
+        console.log("BindableTest2 onBindTest1", value);
+    }
+
+    onBindTest2(value: number) {
+        console.log("BindableTest2 onBindTest2", value);
+    }
+}
+
 @ccclass("Test")
 export class Test extends Component {
     private a: number = 1;
@@ -105,6 +158,20 @@ export class Test extends Component {
         let h5 = ReferencePool.acquire<HelloWorldClass<number>>(HelloWorldClass1);
         h5.value = 1;
         console.log(ReferencePool.getAllReferencePoolInfos());
+
+        let scheduleText = new ScheduleText();
+        //scheduleText.test1();
+
+        let bindableTest = new BindableTest();
+        let bindableTest1 = new BindableTest1();
+        let bindableTest2 = new BindableTest2();
+        bindableTest1.registerEvent(bindableTest);
+        bindableTest2.registerEvent(bindableTest);
+        bindableTest.a.value = 5;
+        bindableTest1.unregisterEvent(bindableTest);
+        bindableTest.a.value = 6;
+        bindableTest2.unregisterEvent(bindableTest);
+        bindableTest.a.value = 7;
     }
 
     onCallback(sender: object, e: any) {

@@ -1,5 +1,5 @@
 import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
-import { IPlatformHelper } from "./Helper/IPlatformHelper";
+import { IPlatformHelper } from "./IPlatformHelper";
 import { IPlatformManager } from "./IPlatformManager";
 import { AndroidPlatform } from "./Platform/Android/AndroidPlatform";
 import { IOSPlatform } from "./Platform/IOS/IOSPlatform";
@@ -39,7 +39,7 @@ export class PlatformManager implements IPlatformManager {
         }
     }
 
-    initalize(platformHelper: IPlatformHelper) {
+    setPlatformHelper(platformHelper: IPlatformHelper) {
         this._platformHelper = platformHelper;
         this._platformType = this._platformHelper.getPlatformType();
         if (!this._platform) {

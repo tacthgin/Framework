@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from "cc";
+import { _decorator, Component, Node, macro } from "cc";
 import { GameEventArgs } from "../GameFramework/Script/Event/GameEventArgs";
 const { ccclass, property } = _decorator;
 

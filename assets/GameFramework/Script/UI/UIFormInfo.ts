@@ -3,12 +3,12 @@ import { ReferencePool } from "../Base/ReferencePool/ReferencePool";
 import { IUIForm } from "./IUIForm";
 
 export class UIFormInfo implements IRerference {
-    private _uiForm: IUIForm | null = null;
+    private _uiForm: IUIForm = null!;
     private _paused: boolean = false;
     private _covered: boolean = false;
 
     get uiForm(): IUIForm {
-        return this._uiForm!;
+        return this._uiForm;
     }
 
     set paused(value: boolean) {
@@ -36,7 +36,7 @@ export class UIFormInfo implements IRerference {
     }
 
     clear(): void {
-        this._uiForm = null;
+        this._uiForm = null!;
         this._paused = false;
         this._covered = false;
     }

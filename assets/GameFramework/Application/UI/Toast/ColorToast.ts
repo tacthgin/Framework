@@ -1,5 +1,5 @@
 import { RichText, tween, UITransform, v3, Vec3, view, _decorator } from "cc";
-import { GameApp } from "../../GameApp";
+import { GameApp } from "../../Base/GameApp";
 import { ToastType } from "./ToastType";
 import { ToastUIForm } from "./ToastUIForm";
 

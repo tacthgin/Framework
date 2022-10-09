@@ -1,6 +1,5 @@
 import { Vec3 } from "cc";
-import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
-import { IUIManager } from "../../Script/UI/IUIManager";
+import { GameApp } from "../Base/GameApp";
 import { ToastType } from "./Toast/ToastType";
 import { UIConstant } from "./UIConstant";
 
@@ -8,19 +7,7 @@ import { UIConstant } from "./UIConstant";
  * UI工厂
  */
 export class UIFactory {
-    private static _toastAssetPath: string = "";
-    private static _uiManager: IUIManager = null!;
-
-    static setToastAssetPath(path: string): void {
-        if (!path) {
-            throw new GameFrameworkError("toast asset path is invalid");
-        }
-        this._toastAssetPath = path;
-    }
-
-    static setUIManager(uiManager: IUIManager): void {
-        this._uiManager = uiManager;
-    }
+    private static s_toastAssetPath: string = "Prefab/Base/ColorToast";
 
     /**
      * 打开弹窗界面
@@ -29,12 +16,14 @@ export class UIFactory {
      * @param pauseCoveredUIForm 是否暂停被覆盖的界面
      * @returns 界面序列编号
      */
-    static async showDialog(path: string, userData?: Object, pauseCoveredUIForm?: boolean, position: Vec3 = Vec3.ZERO): Promise<number> {
-        let dialogId = await this._uiManager.openUIForm(path, UIConstant.DIALOG_LAYER_GROUP, userData, pauseCoveredUIForm);
-        let uiForm = this._uiManager.getUIForm(dialogId);
+    static async showDialog(path: string, userData?: Object, pauseCoveredUIForm: boolean = false, position: Vec3 = Vec3.ZERO): Promise<number> {
+        let uiManager = GameApp.UIManager;
+        let dialogId = await uiManager.openUIForm(path, UIConstant.DIALOG_LAYER_GROUP, pauseCoveredUIForm, userData);
+        let uiForm = uiManager.getUIForm(dialogId);
         if (uiForm) {
             (uiForm as any).node.position = position;
         }
+
         return dialogId;
     }
 
@@ -45,6 +34,6 @@ export class UIFactory {
      * @returns 界面序列编号
      */
     static showToast(content: string, toastType: ToastType = ToastType.NORAML): Promise<number> {
-        return this._uiManager.openUIForm(this._toastAssetPath, UIConstant.TOAST_LAYER_GROUP, { content: content, toastType: toastType });
+        return GameApp.UIManager.openUIForm(this.s_toastAssetPath, UIConstant.TOAST_LAYER_GROUP, false, { content: content, toastType: toastType });
     }
 }

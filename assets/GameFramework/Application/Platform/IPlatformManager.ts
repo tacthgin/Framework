@@ -1,4 +1,4 @@
-import { IPlatformHelper } from "./Helper/IPlatformHelper";
+import { IPlatformHelper } from "./IPlatformHelper";
 import { INativePlatform, IPlatform, IWebPlatform } from "./Platform/IPlatform";
 import { PlatformType } from "./PlatformType";
 
@@ -25,7 +25,7 @@ export interface IPlatformManager {
      * 平台管理器初始化
      * @param platformHelper 平台辅助器
      */
-    initalize(platformHelper: IPlatformHelper): void;
+    setPlatformHelper(platformHelper: IPlatformHelper): void;
 
     /**
      * 是否原生平台

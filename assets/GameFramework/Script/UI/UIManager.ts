@@ -1,3 +1,4 @@
+import { GameFrameworkQueue } from "../Base/Container/GameFrameworkQueue";
 import { EventHandler } from "../Base/EventPool/EventHandler";
 import { EventPool } from "../Base/EventPool/EventPool";
 import { EventPoolMode } from "../Base/EventPool/EventPoolMode";
@@ -29,7 +30,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     private _uiFormHelper: IUIFormHelper = null!;
     private _serialId: number = 0;
     private _shutDown: boolean = false;
-    private _recyleQueue: Array<IUIForm> = null!;
+    private _recyleQueue: GameFrameworkQueue<IUIForm> = null!;
 
     constructor() {
         super();
@@ -37,7 +38,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiFormBeingLoaded = new Map<number, string>();
         this._uiFormToReleaseOnLoad = new Set<number>();
         this._eventPool = new EventPool<UIEventArgs>(EventPoolMode.ALLOW_MULTI_HANDLER);
-        this._recyleQueue = new Array<IUIForm>();
+        this._recyleQueue = new GameFrameworkQueue<IUIForm>();
     }
 
     get uiGroupCount(): number {
@@ -77,7 +78,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     }
 
     update(elapseSeconds: number): void {
-        while (this._recyleQueue.length > 0) {
+        while (this._recyleQueue.size > 0) {
             let uiForm = this._recyleQueue.pop()!;
             uiForm.onRecyle();
             this._instancePool.upspawn(uiForm.handler);
@@ -94,7 +95,8 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         this._uiGroups.clear();
         this._uiFormBeingLoaded.clear();
         this._uiFormToReleaseOnLoad.clear();
-        this._recyleQueue.length = 0;
+        this._recyleQueue.clear();
+        this._recyleQueue.clearCacheNodes();
     }
 
     setObjectPoolManager(objectPoolManager: IObejctPoolManager): void {
@@ -225,7 +227,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         return false;
     }
 
-    async openUIForm(uiFormAssetName: string, uiGroupName: string, userData?: Object, pauseCoveredUIForm: boolean = false): Promise<number> {
+    async openUIForm(uiFormAssetName: string, uiGroupName: string, pauseCoveredUIForm: boolean, userData?: Object): Promise<number> {
         if (!this._resourceManger) {
             throw new GameFrameworkError("you must set resouce manager first");
         }
@@ -249,7 +251,6 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
 
         let serialId = ++this._serialId;
         let uiFromInstanceObject: UIFormInstanceObject | null = this._instancePool.spawn(uiFormAssetName);
-
         let isNewInstance = false;
         if (!uiFromInstanceObject) {
             let asset = this._resourceManger.getAsset(uiFormAssetName);
@@ -276,10 +277,15 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
     closeUIForm(serialIdOrUIForm: number | IUIForm, userData?: object): void {
         let uiForm: IUIForm | null = null;
         if (typeof serialIdOrUIForm === "number") {
-            uiForm = this.getUIForm(serialIdOrUIForm);
-
-            if (!uiForm) {
-                throw new GameFrameworkError("ui form not exist");
+            if (this._uiFormBeingLoaded.get(serialIdOrUIForm)) {
+                this._uiFormBeingLoaded.delete(serialIdOrUIForm);
+                this._uiFormToReleaseOnLoad.add(serialIdOrUIForm);
+                return;
+            } else {
+                uiForm = this.getUIForm(serialIdOrUIForm);
+                if (!uiForm) {
+                    throw new GameFrameworkError("ui form not exist");
+                }
             }
         } else {
             uiForm = serialIdOrUIForm;
@@ -294,7 +300,7 @@ export class UIManager extends GameFrameworkModule implements IUIManager {
         uiForm.onClose(this._shutDown, userData);
         uiGroup.refresh();
         this._eventPool.fireNow(this, UIEventArgs.create(UIEvent.UI_FORM_CLOSE_EVENT));
-        this._recyleQueue.splice(0, 0, uiForm);
+        this._recyleQueue.push(uiForm);
     }
 
     closeAllLoadedUIForms(userData?: object): void {

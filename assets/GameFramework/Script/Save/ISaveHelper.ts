@@ -6,6 +6,7 @@ export interface ISaveHelper {
      * 存储数据个数
      */
     readonly count: number;
+
     /**
      * 存储数字类型
      * @param name 存储名
