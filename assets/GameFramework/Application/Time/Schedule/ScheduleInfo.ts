@@ -1,4 +1,3 @@
-
 import { IRerference } from "../../../Script/Base/ReferencePool/IRerference";
 import { ReferencePool } from "../../../Script/Base/ReferencePool/ReferencePool";
 import { IScheduleBase } from "./IScheduleBase";
@@ -27,10 +26,10 @@ export class ScheduleInfo implements IRerference {
         return this._target;
     }
 
-    static create(handler: Function, thisArg: IScheduleBase, interval: number, scheduleCount: number, priority: number): ScheduleInfo {
+    static create(handler: Function, target: IScheduleBase, interval: number, scheduleCount: number, priority: number): ScheduleInfo {
         let scheduleInfo = ReferencePool.acquire(ScheduleInfo);
         scheduleInfo._handler = handler;
-        scheduleInfo._target = thisArg;
+        scheduleInfo._target = target;
         scheduleInfo._interval = interval;
         scheduleInfo._scheduleCount = scheduleCount;
         scheduleInfo._priority = priority;

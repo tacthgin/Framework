@@ -4,35 +4,22 @@ import { GameFrameworkError } from "../../../Script/Base/GameFrameworkError";
 
 /** 定时器基类 */
 export class ScheduleBase implements IScheduleBase {
-    private _isUpdate: boolean = false;
-    private _isFiexedUpdate: boolean = false;
+    private _pause: boolean = false;
 
-    set isUpdate(value: boolean) {
-        if (this._isUpdate === value) return;
-        this._isUpdate = value;
-        TimeManager.addOrRemoveFromUpdatePool(this, this._isUpdate);
+    set pause(value: boolean) {
+        this._pause = value;
     }
 
-    /** 是否需要每帧更新 */
-    get isUpdate(): boolean {
-        return this._isUpdate;
+    get pause(): boolean {
+        return this._pause;
     }
 
-    set isFixedUpdate(value: boolean) {
-        if (this._isFiexedUpdate === value) return;
-        this._isFiexedUpdate = value;
-        TimeManager.addOrRemoveFromFixedUpdatePool(this, this._isFiexedUpdate);
-    }
-
-    /** 是否需要每物理帧更新 */
-    get isFixedUpdate(): boolean {
-        return this._isFiexedUpdate;
+    awake(): void {
+        TimeManager.addTarget(this);
     }
 
     clear(): void {
-        this.unscheduleAll();
-        this.isUpdate = false;
-        this.isFixedUpdate = false;
+        TimeManager.removeTarget(this);
     }
 
     /**
@@ -87,10 +74,4 @@ export class ScheduleBase implements IScheduleBase {
             }, seconds);
         });
     }
-
-    /**
-     * 轮询定时器
-     * @param elapseSeconds 逻辑流逝时间
-     */
-    update(elapseSeconds: number): void {}
 }

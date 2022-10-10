@@ -4,6 +4,7 @@ import { GameFrameworkError } from "../../Script/Base/GameFrameworkError";
 import { ReferencePool } from "../../Script/Base/ReferencePool/ReferencePool";
 import { IScheduleBase } from "./Schedule/IScheduleBase";
 import { ScheduleInfo } from "./Schedule/ScheduleInfo";
+import { TimeInfo } from "./TimeInfo";
 
 /**
  * 时间管理器
@@ -17,20 +18,18 @@ export class TimeManager {
     private static readonly _updateSet: Set<IScheduleBase> = new Set<IScheduleBase>();
     /** 物理帧更新集合 */
     private static readonly _fixedUpdateSet: Set<IScheduleBase> = new Set<IScheduleBase>();
-    /** 物理步长 */
-    private static _fixedTimeStep: number = 1 / 60;
-    /** 物理累计时间 */
-    private static _fixedCurrentTime: number = 0;
+    /** 时间相关的配置 */
+    private static _timeInfo: TimeInfo = new TimeInfo();
 
     static set fixedTimeStep(value: number) {
-        this._fixedTimeStep = value;
+        this._timeInfo.fixedTimeStep = value;
     }
 
     /**
      * 物理步长
      */
     static get fixedTimeStep(): number {
-        return this._fixedTimeStep;
+        return this._timeInfo.fixedTimeStep;
     }
 
     /**
@@ -105,35 +104,28 @@ export class TimeManager {
     }
 
     /**
-     * 从帧更新池放入或者拿出
-     * @param target 定时器目标
-     * @param addOrRemove 放入(true)还是拿出(false)
+     * 添加更新目标
+     * @param target 目标
      */
-    static addOrRemoveFromUpdatePool(target: IScheduleBase, addOrRemove: boolean): void {
-        if (addOrRemove) {
-            this._updateSet.add(target);
-        } else {
-            this._updateSet.delete(target);
-        }
+    static addTarget(target: IScheduleBase) {
+        target?.update && this._updateSet.add(target);
+        target?.fixedUpdate && this._fixedUpdateSet.add(target);
     }
 
     /**
-     * 从物理帧更新池放入或者拿出
-     * @param target 定时器目标
-     * @param addOrRemove 放入(true)还是拿出(false)
+     * 移除更新目标
+     * @param target 目标
      */
-    static addOrRemoveFromFixedUpdatePool(target: IScheduleBase, addOrRemove: boolean): void {
-        if (addOrRemove) {
-            this._fixedUpdateSet.add(target);
-            if (!target.fixedUpdate) {
-                throw new GameFrameworkError("you must set fixedUpdate function first");
-            }
-        } else {
+    static removeTarget(target: IScheduleBase) {
+        target?.update && this._updateSet.delete(target);
+        if (target?.fixedUpdate) {
             this._fixedUpdateSet.delete(target);
             if (this._fixedUpdateSet.size == 0) {
-                this._fixedCurrentTime = 0;
+                this._timeInfo.fixedCurrentTime = 0;
             }
         }
+
+        this.unscheduleAll(target);
     }
 
     /**
@@ -171,7 +163,7 @@ export class TimeManager {
 
         if (this._updateSet.size > 0) {
             for (let scheduleBase of this._updateSet) {
-                scheduleBase.update(elapseSeconds);
+                scheduleBase.update!(elapseSeconds);
             }
         }
     }
@@ -182,13 +174,13 @@ export class TimeManager {
      */
     private static internalFixedUpdate(elapseSeconds: number): void {
         if (this._fixedUpdateSet.size > 0) {
-            this._fixedCurrentTime += elapseSeconds;
-            while (this._fixedCurrentTime >= this._fixedTimeStep) {
+            let fixedTimeStep = this._timeInfo.fixedTimeStep;
+            this._timeInfo.fixedCurrentTime += elapseSeconds;
+            while (this._timeInfo.fixedCurrentTime >= fixedTimeStep) {
                 for (let scheduleBase of this._fixedUpdateSet) {
-                    scheduleBase.fixedUpdate!(this._fixedTimeStep);
+                    scheduleBase.fixedUpdate!(fixedTimeStep);
                 }
-
-                this._fixedCurrentTime -= this._fixedTimeStep;
+                this._timeInfo.fixedCurrentTime -= fixedTimeStep;
             }
         }
     }
